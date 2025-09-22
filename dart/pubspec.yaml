@@ -1,0 +1,19 @@
+name: egosms_sdk
+description: EgoSms SDK for Dart clients.
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+homepage: https://www.pahappa.com
+
+environment:
+  sdk: ^3.8.1
+
+# Add regular dependencies here.
+dependencies:
+  http: ^0.13.3
+  json_annotation: ^4.0.1
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
+  build_runner: ^2.1.5
+  json_serializable: ^6.10.0

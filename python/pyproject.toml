@@ -1,0 +1,12 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools"]
+
+[project]
+name = "egosms_sdk"
+version = "1.0.0"
+authors = [{name = "Pahappa Limited", email = "systems@pahappa.com"}]
+description = "EgoSMS Python SDK"
+license.text = "MIT"
+dependencies = ["requests"]
+readme = "README.md"

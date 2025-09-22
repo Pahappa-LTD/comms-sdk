@@ -1,0 +1,27 @@
+package com.pahappa.systems.egosmssdk.v1;
+
+import org.junit.Test;
+import com.pahappa.systems.egosmssdk.v1.models.MessagePriority;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+public class EgoSmsSDKTest {
+
+    @Test
+    public void checkFunctionality() {
+        EgoSmsSDK.useSandBox();
+        EgoSmsSDK sdk = EgoSmsSDK.authenticate("aganisandbox", "SandBox");
+        long balance1 = Long.parseLong(sdk.getBalance());
+        System.out.println("Balance1: SHS." + balance1);
+        sdk.sendSMS("234", "testing");
+
+        List<String> numbers = Arrays.asList("256789123456", "+256789123457", "256789123458");
+        sdk.sendSMS(numbers, "Sample SMS Message", "CustomSenderID", MessagePriority.HIGHEST);
+        long balance2 = Long.parseLong(sdk.getBalance());
+        System.out.println("Balance2: SHS." + balance2);
+        assertTrue(balance1 > balance2);
+    }
+}

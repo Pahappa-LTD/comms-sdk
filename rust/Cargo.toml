@@ -1,0 +1,15 @@
+[package]
+name = "egosms_sdk"
+version = "1.0.0"
+edition = "2024"
+description = "EgoSMS Rust SDK"
+license = "MIT"
+authors = ["Pahappa Limited <systems@pahappa.com>"]
+repository = "https://www.github.com/pahappa-ltd/EgoSmsSDK"
+homepage = "https://pahappa.com"
+
+[dependencies]
+regex = "1.11.1"
+reqwest = { version = "0.12.23", features = ["json", "blocking"] }
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0.99"
