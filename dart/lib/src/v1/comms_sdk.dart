@@ -10,39 +10,43 @@ import 'models/user_data.dart';
 import 'utils/number_validator.dart';
 import 'utils/validator.dart';
 
-class EgoSmsSDK {
-  static String _apiUrl = 'https://www.egosms.co/api/v1/json/';
+class CommsSDK {
+  static String _apiUrl = 'http://176.58.101.43:8080/communications/api/v1/json/';
   static String getApiUrl() => _apiUrl;
 
-  String? username;
-  String? password;
+  String? userName;
+  String? apiKey;
 
-  String senderId = 'EgoSms';
+  String senderId = 'EgoSMS';
   bool isAuthenticated = false;
   final http.Client _client = http.Client();
 
-  EgoSmsSDK._();
+  CommsSDK._();
 
-  static Future<EgoSmsSDK> authenticate(
-    String username,
-    String password,
+  static Future<CommsSDK> authenticate(
+    String userName,
+    String apiKey,
   ) async {
-    final sdk = EgoSmsSDK._();
-    sdk.username = username;
-    sdk.password = password;
+    final sdk = CommsSDK._();
+    sdk.userName = userName;
+    sdk.apiKey = apiKey;
     await Validator.validateCredentials(sdk);
     return sdk;
   }
 
   static void useSandBox() {
-    _apiUrl = 'http://sandbox.egosms.co/api/v1/json/';
+    _apiUrl = 'http://176.58.101.43:8080/communications/api/v1/json';
   }
 
   static void useLiveServer() {
-    _apiUrl = 'https://www.egosms.co/api/v1/json/';
+    _apiUrl = 'http://176.58.101.43:8080/communications/api/v1/json';
   }
 
-  EgoSmsSDK withSenderId(String senderId) {
+  void setAuthenticated() {
+    isAuthenticated = true;
+  }
+
+  CommsSDK withSenderId(String senderId) {
     this.senderId = senderId;
     return this;
   }
@@ -53,28 +57,58 @@ class EgoSmsSDK {
     String? senderId,
     MessagePriority? priority,
   }) async {
-    if (await _sdkNotAuthenticated()) return false;
+    final apiResponse = await querySendSMS(
+      numbers: numbers,
+      message: message,
+      senderId: senderId ?? this.senderId,
+      priority: priority ?? MessagePriority.HIGHEST,
+    );
+
+    if (apiResponse == null) {
+      print('Failed to get a response from the server.');
+      return false;
+    }
+
+    if (apiResponse.status.name.toLowerCase() == "ok") {
+      print('SMS sent successfully.');
+      print('MessageFollowUpUniqueCode: ${apiResponse.messageFollowUpCode}');
+      return true;
+    } else if (apiResponse.status.name.toLowerCase() == "failed") {
+      print('Failed: ${apiResponse.message}');
+      return false;
+    } else {
+      throw Exception('Unexpected response status: ${apiResponse.status}');
+    }
+  }
+
+  /// Same as [sendSMS] but returns the full [ApiResponse] object.
+  Future<ApiResponse?> querySendSMS({
+    required List<String> numbers,
+    required String message,
+    required String senderId,
+    required MessagePriority priority,
+  }) async {
+    if (await _sdkNotAuthenticated()) return null;
     if (numbers.isEmpty) {
-      throw ArgumentError('Numbers list cannot be null or empty');
+      throw ArgumentError('Numbers list cannot be empty');
     }
     if (message.isEmpty) {
-      throw ArgumentError('Message cannot be null or empty');
+      throw ArgumentError('Message cannot be empty');
     }
     if (message.length == 1) {
       throw ArgumentError('Message cannot be a single character');
     }
-    if (senderId == null || senderId.trim().isEmpty) {
+    if (senderId.trim().isEmpty) {
       senderId = this.senderId;
     }
     if (senderId.length > 11) {
       print('Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.');
     }
-    priority ??= MessagePriority.HIGHEST;
 
     numbers = NumberValidator.validateNumbers(numbers);
     if (numbers.isEmpty) {
       print('No valid phone numbers provided. Please check inputs.');
-      return false;
+      return null;
     }
 
     final messageModels = numbers
@@ -82,8 +116,8 @@ class EgoSmsSDK {
           (number) => MessageModel(
             number: number,
             message: message,
-            senderId: senderId!,
-            priority: priority!,
+            senderId: senderId,
+            priority: priority,
           ),
         )
         .toList();
@@ -91,28 +125,20 @@ class EgoSmsSDK {
     final apiRequest = ApiRequest(
       method: 'SendSms',
       messageData: messageModels,
-      userdata: UserData(username!, password!),
-    );
-
-    final res = await _client.post(
-      Uri.parse(_apiUrl),
-      body: jsonEncode(apiRequest.toJson()),
-      headers: {'Content-Type': 'application/json'},
+      userdata: UserData(userName!, apiKey!),
     );
 
     try {
-      final apiResponse = ApiResponse.fromJson(jsonDecode(res.body));
-      if (apiResponse.status.name.toLowerCase() == "ok") {
-        print('SMS sent successfully.');
-        print('MessageFollowUpUniqueCode: ${apiResponse.messageFollowUpCode}');
-        return true;
-      } else {
-        throw Exception(apiResponse.message);
-      }
+      final res = await _client.post(
+        Uri.parse(_apiUrl),
+        body: jsonEncode(apiRequest.toJson()),
+        headers: {'Content-Type': 'application/json'},
+      );
+      return ApiResponse.fromJson(jsonDecode(res.body));
     } catch (e) {
       print('Failed to send SMS: $e');
       print('Request: ${jsonEncode(apiRequest.toJson())}');
-      return false;
+      return null;
     }
   }
 
@@ -127,13 +153,14 @@ class EgoSmsSDK {
     return false;
   }
 
-  Future<String?> getBalance() async {
+  /// Same as [getBalance] but returns the full [ApiResponse] object.
+  Future<ApiResponse?> queryBalance() async {
     if (await _sdkNotAuthenticated()) {
       return null;
     }
     final apiRequest = ApiRequest(
       method: 'Balance',
-      userdata: UserData(username!, password!),
+      userdata: UserData(userName!, apiKey!),
       messageData: [],
     );
     try {
@@ -142,11 +169,19 @@ class EgoSmsSDK {
         body: jsonEncode(apiRequest.toJson()),
         headers: {'Content-Type': 'application/json'},
       );
-      final response = ApiResponse.fromJson(jsonDecode(res.body));
-      print('MessageFollowUpUniqueCode: ${response.messageFollowUpCode}');
-      return response.balance;
+      return ApiResponse.fromJson(jsonDecode(res.body));
     } catch (e) {
       throw Exception('Failed to get balance: $e');
     }
+  }
+
+  Future<double?> getBalance() async {
+    final response = await queryBalance();
+    return response?.balance != null ? double.tryParse(response!.balance!) : null;
+  }
+
+  @override
+  String toString() {
+    return 'SDK($userName => $apiKey)';
   }
 }

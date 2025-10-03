@@ -3,7 +3,8 @@ import 'api_response_code.dart';
 class ApiResponse {
   ApiResponseCode status;
   String? message;
-  String? cost;
+  int? cost;
+  String? currency;
   String? messageFollowUpCode;
   String? balance;
 
@@ -12,7 +13,8 @@ class ApiResponse {
           ? ApiResponseCode.OK
           : ApiResponseCode.Failed,
       message = json['Message'],
-      cost = json['Cost'].toString(),
+      cost = json['Cost'] != null ? int.tryParse(json['Cost'].toString()) : null,
+      currency = json['Currency'],
       messageFollowUpCode = json['MsgFollowUpUniqueCode'],
-      balance = json['Balance'].toString();
+      balance = json['Balance']?.toString();
 }
