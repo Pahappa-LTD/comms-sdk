@@ -7,7 +7,7 @@ use regex::Regex;
 use reqwest::blocking::Client;
 
 use crate::{
-    EgoSmsSDK,
+    CommsSDK,
     models::{ApiRequest, ApiResponse, ApiResponseCode, UserData},
 };
 
@@ -43,9 +43,9 @@ pub fn validate_numbers<S: AsRef<str>>(numbers: Vec<S>) -> Vec<String> {
     cleansed.into_iter().collect()
 }
 
-pub fn validate_credentials(sdk: &mut EgoSmsSDK) -> Result<bool, Error> {
+pub fn validate_credentials(sdk: &mut CommsSDK) -> Result<bool, Error> {
     // let mut is_api_key = true;
-    if sdk.password.trim().is_empty() || sdk.username.trim().is_empty() {
+    if sdk.api_key.trim().is_empty() || sdk.user_name.trim().is_empty() {
         return Err(Error::new(
             ErrorKind::Other,
             "Username and Password must be provided",
@@ -55,11 +55,11 @@ pub fn validate_credentials(sdk: &mut EgoSmsSDK) -> Result<bool, Error> {
     Ok(val)
 }
 
-fn is_valid_credential(sdk: &mut EgoSmsSDK) -> bool {
+fn is_valid_credential(sdk: &mut CommsSDK) -> bool {
     let client = Client::new();
     let request = ApiRequest {
         method: "Balance".into(),
-        userdata: UserData::new(&sdk.username, &sdk.password),
+        userdata: UserData::new(&sdk.user_name, &sdk.api_key),
         message_data: None,
     };
     return match client.post(&sdk.api_url).json(&request).send() {

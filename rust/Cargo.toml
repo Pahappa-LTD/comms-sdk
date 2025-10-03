@@ -1,11 +1,11 @@
 [package]
-name = "egosms_sdk"
+name = "comms_sdk"
 version = "1.0.0"
 edition = "2024"
-description = "EgoSMS Rust SDK"
+description = "Pahappa Comms platform Rust SDK"
 license = "MIT"
 authors = ["Pahappa Limited <systems@pahappa.com>"]
-repository = "https://www.github.com/pahappa-ltd/EgoSmsSDK"
+repository = "https://www.github.com/pahappa-ltd/CommsSDK"
 homepage = "https://pahappa.com"
 
 [dependencies]

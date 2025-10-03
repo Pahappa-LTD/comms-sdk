@@ -67,16 +67,14 @@ pub struct ApiRequest {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiResponse {
     #[serde(rename = "Status")]
-    pub status: String, // Changed from ApiResponseCode to String to match other implementations
+    pub status: ApiResponseCode,
     #[serde(rename = "Message")]
     pub message: Option<String>,
     #[serde(rename = "Cost")]
     pub cost: Option<i32>,
-    #[serde(rename = "Currency")]
-    pub currency: Option<String>,
     #[serde(rename = "MsgFollowUpUniqueCode")]
     pub message_follow_up_code: Option<String>,
     #[serde(rename = "Balance")]
-    pub balance: Option<String>,
+    pub balance: Option<f64>,
 }
 
