@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace EgoSms.Models;
+namespace Comms.Models;
 
 public class ApiResponse
 {
@@ -11,11 +11,14 @@ public class ApiResponse
     public string? Message { get; set; }
 
     [JsonPropertyName("Cost")]
-    public string? Cost { get; set; }
+    public int? Cost { get; set; }
+
+    [JsonPropertyName("Currency")]
+    public string? Currency { get; set; }
 
     [JsonPropertyName("MsgFollowUpUniqueCode")]
     public string? MessageFollowUpCode { get; set; }
 
     [JsonPropertyName("Balance")]
-    public string? Balance { get; set; }
+    public double? Balance { get; set; }
 }

@@ -1,5 +1,5 @@
-using EgoSms.Models;
-using EgoSms.Utils;
+using Comms.Models;
+using Comms.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,32 +8,26 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace EgoSms
+namespace Comms
 {
-    public class EgoSmsSdk
+    public class CommsSdk
     {
-        public static string ApiUrl = "https://www.egosms.co/api/v1/json/";
+        public static string ApiUrl { get; private set; } = "http://176.58.101.43:8080/communications/api/v1/json/";
         private static readonly HttpClient Client = new();
 
+        public string? UserName { get; private set; }
         public string? ApiKey { get; private set; }
-        public string? Username { get; private set; }
-        public string? Password { get; private set; }
-        public string SenderId { get; private set; } = "EgoSms";
+        public string SenderId { get; private set; } = "EgoSMS";
         public bool IsAuthenticated { get; set; }
 
-        private EgoSmsSdk() { }
+        private CommsSdk() { }
 
-        public static Task<EgoSmsSdk> Authenticate(string apiKey)
+        public static async Task<CommsSdk> Authenticate(string userName, string apiKey)
         {
-            throw new NotSupportedException("API Key authentication is not supported in this version. Please use username and password authentication.");
-        }
-
-        public static async Task<EgoSmsSdk> Authenticate(string username, string password)
-        {
-            var sdk = new EgoSmsSdk
+            var sdk = new CommsSdk
             {
-                Username = username,
-                Password = password
+                UserName = userName,
+                ApiKey = apiKey
             };
             await Validator.ValidateCredentials(sdk);
             return sdk;
@@ -41,15 +35,20 @@ namespace EgoSms
 
         public static void UseSandBox()
         {
-            ApiUrl = "http://sandbox.egosms.co/api/v1/json/";
+            ApiUrl = "http://176.58.101.43:8080/communications/api/v1/json";
         }
 
         public static void UseLiveServer()
         {
-            ApiUrl = "https://www.egosms.co/api/v1/json/";
+            ApiUrl = "http://176.58.101.43:8080/communications/api/v1/json";
         }
 
-        public EgoSmsSdk WithSenderId(string senderId)
+        public void SetAuthenticated()
+        {
+            IsAuthenticated = true;
+        }
+
+        public CommsSdk WithSenderId(string senderId)
         {
             SenderId = senderId;
             return this;
@@ -78,13 +77,37 @@ namespace EgoSms
 
         public async Task<bool> SendSms(List<string> numbers, string message, string senderId, MessagePriority priority)
         {
-            if (await SdkNotAuthenticated()) return false;
+            var apiResponse = await QuerySendSms(numbers, message, senderId, priority);
+            if (apiResponse == null)
+            {
+                Console.WriteLine("Failed to get a response from the server.");
+                return false;
+            }
+
+            switch (apiResponse.Status)
+            {
+                case ApiResponseCode.OK:
+                    Console.WriteLine("SMS sent successfully.");
+                    Console.WriteLine($"MessageFollowUpUniqueCode: {apiResponse.MessageFollowUpCode}");
+                    return true;
+                case ApiResponseCode.Failed:
+                    Console.WriteLine($"Failed: {apiResponse.Message}");
+                    return false;
+                default:
+                    throw new Exception("Unexpected response status: " + apiResponse.Status);
+            }
+        }
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public async Task<ApiResponse?> QuerySendSms(List<string> numbers, string message, string senderId, MessagePriority priority)
+        {
+            if (await SdkNotAuthenticated()) return null;
 
             if (numbers == null || !numbers.Any())
-                throw new ArgumentException("Numbers list cannot be null or empty");
+                throw new ArgumentException("Numbers list cannot be empty");
 
             if (string.IsNullOrEmpty(message))
-                throw new ArgumentException("Message cannot be null or empty");
+                throw new ArgumentException("Message cannot be empty");
         
             if (message.Length == 1)
                 throw new ArgumentException("Message cannot be a single character");
@@ -99,15 +122,14 @@ namespace EgoSms
             if (!numbers.Any())
             {
                 Console.Error.WriteLine("No valid phone numbers provided. Please check inputs.");
-                return false;
+                return null;
             }
 
             var apiRequest = new ApiRequest
             {
                 Method = "SendSms",
                 MessageData = numbers.Select(num => new MessageModel(num, message, senderId ?? this.SenderId, priority)).ToList(),
-                Userdata = new UserData(Username!, Password!),
-            
+                Userdata = new UserData(UserName!, ApiKey!),
             };
 
             try
@@ -118,19 +140,7 @@ namespace EgoSms
                 response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse>(responseBody);
-
-                switch (apiResponse?.Status)
-                {
-                    case ApiResponseCode.OK:
-                        Console.WriteLine("SMS sent successfully.");
-                        Console.WriteLine($"MessageFollowUpUniqueCode: {apiResponse.MessageFollowUpCode}");
-                        return true;
-                    case ApiResponseCode.Failed:
-                        throw new Exception(apiResponse.Message);
-                    default:
-                        throw new Exception("Unexpected response status: " + apiResponse?.Status);
-                }
+                return JsonSerializer.Deserialize<ApiResponse>(responseBody);
             }
             catch (Exception e)
             {
@@ -140,7 +150,7 @@ namespace EgoSms
                     Console.Error.WriteLine("Request: " + JsonSerializer.Serialize(apiRequest));
                 }
                 catch { }
-                return false;
+                return null;
             }
         }
 
@@ -153,14 +163,15 @@ namespace EgoSms
             return !await Validator.ValidateCredentials(this);
         }
 
-        public async Task<string?> GetBalance()
+        /// <summary>Same as <see cref="GetBalance"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public async Task<ApiResponse?> QueryBalance()
         {
             if (await SdkNotAuthenticated()) return null;
 
             var apiRequest = new ApiRequest
             {
                 Method = "Balance",
-                Userdata = new UserData(Username!, Password!)
+                Userdata = new UserData(UserName!, ApiKey!)
             };
 
             try
@@ -171,17 +182,24 @@ namespace EgoSms
                 response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponse>(responseBody);
-
-                Console.WriteLine($"MessageFollowUpUniqueCode: {apiResponse?.MessageFollowUpCode}");
-                return apiResponse?.Balance;
+                return JsonSerializer.Deserialize<ApiResponse>(responseBody);
             }
             catch (Exception e)
             {
                 throw new Exception("Failed to get balance: " + e.Message, e);
             }
         }
+
+        public async Task<double?> GetBalance()
+        {
+            var response = await QueryBalance();
+            return response?.Balance;
+        }
+
+        public override string ToString()
+        {
+            return $"SDK({UserName} => {ApiKey})";
+        }
     }
 
 }
-

@@ -1,19 +1,17 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace EgoSms.Models;
+namespace Comms.Models;
 
 public class UserData{
     [JsonPropertyName("username")]
     public string Username { get; set; }
     [JsonPropertyName("password")]
-    public string Password { get; set; }
+    public string ApiKey { get; set; }
 
-    public UserData(string username, string password)
+    public UserData(string userName, string apiKey)
     {
-        Password = password ?? throw new ArgumentNullException(nameof(password));
-        Username = username ?? throw new ArgumentNullException(nameof(username));
+        Username = userName ?? throw new ArgumentNullException(nameof(userName));
+        ApiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
     }
-
-
 }
