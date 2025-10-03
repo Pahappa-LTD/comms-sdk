@@ -38,7 +38,13 @@ class JSONSerializable:
 @dataclass
 class UserData(JSONSerializable):
     username: str
-    password: str
+    apikey: str
+
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "password": self.apikey  # Maps to "password" in JSON
+        }
 
 @dataclass
 class MessageModel(JSONSerializable):
@@ -55,8 +61,9 @@ class ApiRequest(JSONSerializable):
 
 @dataclass
 class ApiResponse(JSONSerializable):
-    Status: ApiResponseCode
+    Status: str
     Message: Optional[str] = None
-    Cost: Optional[str] = None
+    Cost: Optional[int] = None
+    Currency: Optional[str] = None
     MsgFollowUpUniqueCode: Optional[str] = None
     Balance: Optional[str] = None

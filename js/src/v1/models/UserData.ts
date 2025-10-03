@@ -1,24 +1,16 @@
 export class UserData {
     public username: string;
-    public password: string;
+    public apikey: string;
 
-    constructor(username: string, password: string) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public getUsername(): string {
-        return this.username;
-    }
-
-    public getPassword(): string {
-        return this.password;
+    constructor(userName: string, apiKey: string) {
+        this.username = userName;
+        this.apikey = apiKey;
     }
 
     public toArray(): object {
         return {
             username: this.username,
-            password: this.password,
+            password: this.apikey,
         };
     }
 }

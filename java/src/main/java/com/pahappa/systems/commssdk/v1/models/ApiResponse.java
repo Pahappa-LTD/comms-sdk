@@ -1,4 +1,4 @@
-package com.pahappa.systems.egosmssdk.v1.models;
+package com.pahappa.systems.commssdk.v1.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -10,9 +10,11 @@ public class ApiResponse {
     @JsonProperty(value = "Message")
     private String message;
     @JsonProperty(value = "Cost")
-    private String cost;
+    private Integer cost;
+    @JsonProperty(value = "Currency")
+    private String currency;
     @JsonProperty(value = "MsgFollowUpUniqueCode")
     private String messageFollowUpCode;
     @JsonProperty(value = "Balance")
-    private String balance;
+    private Double balance;
 }
