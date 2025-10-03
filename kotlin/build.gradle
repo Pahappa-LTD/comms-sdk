@@ -1,0 +1,46 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "1.9.0"  // replace with your Kotlin version
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+    // snapshots
+    maven {
+        url = 'https://central.sonatype.com/repository/maven-snapshots/'
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+    // snapshots
+    maven {
+        url = 'https://maven.pkg.github.com/pahappa-ltd/packages/'
+        mavenContent {
+            snapshotsOnly()
+        }
+        credentials {
+            username = "strongthedev"//project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            project.findProperty("gpr.key")  ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+
+}
+
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
+    implementation("org.springframework:spring-web:5.3.31")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.5")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.5")
+    // add other dependencies here
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+}
+
+application {
+    mainClass = 'MainKt'  // replace with your main class containing main() function
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    kotlinOptions.jvmTarget = "1.8"  // target JVM version
+}
