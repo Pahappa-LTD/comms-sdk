@@ -34,12 +34,13 @@ pub enum MessagePriority {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserData {
     pub username: String,
-    pub password: String,
+    #[serde(rename = "password")]
+    pub password: String, // This is actually the API key, but serializes as "password"
 }
 
 impl UserData {
-    pub fn new(username: &str, password: &str) -> Self {
-        Self { username: username.into(), password: password.into() }
+    pub fn new(username: &str, api_key: &str) -> Self {
+        Self { username: username.into(), password: api_key.into() }
     }
 }
 
@@ -66,11 +67,13 @@ pub struct ApiRequest {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiResponse {
     #[serde(rename = "Status")]
-    pub status: ApiResponseCode,
+    pub status: String, // Changed from ApiResponseCode to String to match other implementations
     #[serde(rename = "Message")]
     pub message: Option<String>,
     #[serde(rename = "Cost")]
-    pub cost: Option<f64>,
+    pub cost: Option<i32>,
+    #[serde(rename = "Currency")]
+    pub currency: Option<String>,
     #[serde(rename = "MsgFollowUpUniqueCode")]
     pub message_follow_up_code: Option<String>,
     #[serde(rename = "Balance")]
