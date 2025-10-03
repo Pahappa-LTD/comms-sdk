@@ -1,19 +1,19 @@
-package com.pahappa.systems.egosmssdk.v1.utils;
+package com.pahappa.systems.commssdk.v1.utils;
 
-import com.pahappa.systems.egosmssdk.v1.EgoSmsSDK;
-import com.pahappa.systems.egosmssdk.v1.models.ApiRequest;
-import com.pahappa.systems.egosmssdk.v1.models.ApiResponse;
-import com.pahappa.systems.egosmssdk.v1.models.UserData;
+import com.pahappa.systems.commssdk.v1.CommsSDK;
+import com.pahappa.systems.commssdk.v1.models.ApiRequest;
+import com.pahappa.systems.commssdk.v1.models.ApiResponse;
+import com.pahappa.systems.commssdk.v1.models.UserData;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import static com.pahappa.systems.egosmssdk.v1.EgoSmsSDK.API_URL;
-import static com.pahappa.systems.egosmssdk.v1.EgoSmsSDK.OBJECT_MAPPER;
+import static com.pahappa.systems.commssdk.v1.CommsSDK.API_URL;
+import static com.pahappa.systems.commssdk.v1.CommsSDK.OBJECT_MAPPER;
 
 public final class Validator {
-    public static boolean validateCredentials(EgoSmsSDK sdk) {
+    public static boolean validateCredentials(CommsSDK sdk) {
         if (sdk == null) {
-            throw new IllegalArgumentException("EgoSmsSDK instance cannot be null");
+            throw new IllegalArgumentException("CommsSDK instance cannot be null");
         }
         boolean isApiKey = true;
         if (sdk.getApiKey() == null) {
@@ -37,7 +37,7 @@ public final class Validator {
     }
 
 
-    private static boolean isValidCredential(EgoSmsSDK sdk, boolean isApiKey) {
+    private static boolean isValidCredential(CommsSDK sdk, boolean isApiKey) {
         RestTemplate client = new RestTemplate();
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setMethod("Balance");

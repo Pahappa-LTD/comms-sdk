@@ -1,4 +1,4 @@
-package com.pahappa.systems.egosmssdk.v1.models;
+package com.pahappa.systems.commssdk.v1.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

@@ -1,4 +1,4 @@
-package com.pahappa.systems.egosmssdk.v1.utils;
+package com.pahappa.systems.commssdk.v1.utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;

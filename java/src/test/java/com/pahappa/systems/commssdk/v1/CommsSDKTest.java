@@ -1,19 +1,19 @@
-package com.pahappa.systems.egosmssdk.v1;
+package com.pahappa.systems.commssdk.v1;
 
 import org.junit.Test;
-import com.pahappa.systems.egosmssdk.v1.models.MessagePriority;
+import com.pahappa.systems.commssdk.v1.models.MessagePriority;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class EgoSmsSDKTest {
+public class CommsSDKTest {
 
     @Test
     public void checkFunctionality() {
-        EgoSmsSDK.useSandBox();
-        EgoSmsSDK sdk = EgoSmsSDK.authenticate("aganisandbox", "SandBox");
+//        CommsSDK.useSandBox();
+        CommsSDK sdk = CommsSDK.authenticate("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99");
         long balance1 = Long.parseLong(sdk.getBalance());
         System.out.println("Balance1: SHS." + balance1);
         sdk.sendSMS("234", "testing");

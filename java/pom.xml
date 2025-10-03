@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.pahappa.systems</groupId>
-  <artifactId>EgoSmsSDK</artifactId>
+  <artifactId>CommsSDK</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
 
-  <name>EgoSmsSDK</name>
+  <name>CommsSDK</name>
 
   <url>https://pahappa.com</url>
-  <description>EgoSmsSDK</description>
+  <description>CommsSDK</description>
   <licenses>
     <license>
       <name>MIT License</name>
@@ -28,9 +28,9 @@
     </developer>
   </developers>
   <scm>
-    <url>https://www.github.com/pahappa-ltd/EgoSmsSDK</url>
-    <connection>scm:git:git@github.com:pahappa-ltd/EgoSmsSDK.git</connection>
-    <developerConnection>scm:git:git@github.com:pahappa-ltd/EgoSmsSDK.git</developerConnection>
+    <url>https://www.github.com/pahappa-ltd/CommsSDK</url>
+    <connection>scm:git:git@github.com:pahappa-ltd/CommsSDK.git</connection>
+    <developerConnection>scm:git:git@github.com:pahappa-ltd/CommsSDK.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
