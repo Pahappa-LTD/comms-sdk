@@ -1,12 +1,12 @@
-import { EgoSmsSDK } from '../../src/v1/EgoSmsSDK';
+import { CommsSDK } from '../../src/v1/CommsSDK';
 import { MessagePriority } from '../../src/v1/models/MessagePriority';
 
-describe('EgoSmsSDK', () => {
-    let sdk: EgoSmsSDK;
+describe('CommsSDK', () => {
+    let sdk: CommsSDK;
 
     beforeEach(() => {
-        EgoSmsSDK.useSandBox();
-        sdk = EgoSmsSDK.authenticate('aganisandbox', 'SandBox');
+        CommsSDK.useSandBox();
+        sdk = CommsSDK.authenticate('agabu-idaniel', 'dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99');
     });
 
     test('testSendSMSToSingleNumber', async () => {
@@ -27,7 +27,7 @@ describe('EgoSmsSDK', () => {
     });
 
     test('testSendSMSWithInvalidCredentials', async () => {
-        const sdk = EgoSmsSDK.authenticate('invalid_user', 'invalid_password');
+        const sdk = CommsSDK.authenticate('invalid_user', 'invalid_password');
         expect(await sdk.sendSMS('+256772123456', 'Test message')).toBe(false);
     });
 

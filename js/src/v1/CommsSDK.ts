@@ -58,18 +58,18 @@ export class CommsSDK {
         return this._senderId;
     }
 
-    public async sendSMS(
-        number: string,
-        message: string,
-        senderId: string = this._senderId,
-        priority: MessagePriority = MessagePriority.HIGHEST
-    ): Promise<boolean>;
-    public async sendSMS(
-        numbers: string[],
-        message: string,
-        senderId: string = this._senderId,
-        priority: MessagePriority = MessagePriority.HIGHEST
-    ): Promise<boolean>;
+    // public async sendSMS(
+    //     number: string,
+    //     message: string,
+    //     senderId: string = this._senderId,
+    //     priority: MessagePriority = MessagePriority.HIGHEST
+    // ): Promise<boolean>;
+    // public async sendSMS(
+    //     numbers: string[],
+    //     message: string,
+    //     senderId: string = this._senderId,
+    //     priority: MessagePriority = MessagePriority.HIGHEST
+    // ): Promise<boolean>;
     public async sendSMS(
         numbers: string | string[],
         message: string,
@@ -186,7 +186,7 @@ export class CommsSDK {
 
     public async getBalance(): Promise<number | null> {
         const response = await this.queryBalance();
-        return response?.Balance ? parseFloat(response.Balance) : null;
+        return response?.Balance ?? null;
     }
 
     public toString(): string {
