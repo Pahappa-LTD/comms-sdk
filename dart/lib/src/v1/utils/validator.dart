@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import '../egosms_sdk.dart';
+import '../comms_sdk.dart';
 import '../models/api_request.dart';
 import '../models/api_response.dart';
 import '../models/user_data.dart';
 import 'package:http/http.dart' as http;
 
 class Validator {
-  static Future<bool> validateCredentials(EgoSmsSDK sdk) async {
-    if (sdk.username == null || sdk.password == null) {
+  static Future<bool> validateCredentials(CommsSDK sdk) async {
+    if (sdk.userName == null || sdk.apiKey == null) {
       throw ArgumentError("Username and Password must be provided");
     }
 
@@ -27,15 +27,15 @@ class Validator {
     return true;
   }
 
-  static Future<bool> _isValidCredential(EgoSmsSDK sdk) async {
+  static Future<bool> _isValidCredential(CommsSDK sdk) async {
     final client = http.Client();
     final apiRequest = ApiRequest(
       method: 'Balance',
-      userdata: UserData(sdk.username!, sdk.password!),
+      userdata: UserData(sdk.userName!, sdk.apiKey!),
     );
     try {
       final res = await client.post(
-        Uri.parse(EgoSmsSDK.getApiUrl()),
+        Uri.parse(CommsSDK.getApiUrl()),
         body: jsonEncode(apiRequest.toJson()),
         headers: {'Content-Type': 'application/json'},
       );
@@ -43,12 +43,10 @@ class Validator {
       if (apiResponse.status.name.toLowerCase() == "ok") {
         print("Credentials validated successfully.");
         return true;
-      } else {
-        throw Exception(apiResponse.message);
       }
     } catch (e) {
       print("Error validating credentials: $e");
-      return false;
     }
+    return false;
   }
 }

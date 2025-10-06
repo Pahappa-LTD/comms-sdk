@@ -1,21 +1,22 @@
-import '../lib/egosms_sdk.dart';
+import 'package:comms_sdk/comms_sdk.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('checkFunctionality', () async {
-    EgoSmsSDK.useSandBox();
-    final sdk = await EgoSmsSDK.authenticate('aganisandbox', 'SandBox');
-    final balance1 = int.parse(await sdk.getBalance() ?? '0');
+    CommsSDK.useSandBox();
+    final sdk = await CommsSDK.authenticate('agabu-idaniel', 'dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99');
+    final balance1 = await sdk.getBalance() ?? 0;
     print('Balance1: SHS.$balance1');
     await sdk.sendSMS(numbers: ['234'], message: 'testing');
 
     final numbers = ['256789123456', '+256789123457', '256789123458'];
     await sdk.sendSMS(
-        numbers: numbers,
-        message: 'Sample SMS Message',
-        senderId: 'CustomSenderID',
-        priority: MessagePriority.HIGHEST);
-    final balance2 = int.parse(await sdk.getBalance() ?? '0');
+      numbers: numbers,
+      message: 'Sample SMS Message',
+      senderId: 'CustomSenderID',
+      priority: MessagePriority.HIGHEST,
+    );
+    final balance2 = await sdk.getBalance() ?? 0;
     print('Balance2: SHS.$balance2');
     expect(balance1 > balance2, isTrue);
   });

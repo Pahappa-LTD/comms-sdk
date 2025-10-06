@@ -9,7 +9,7 @@ class MessageModel {
   MessageModel({
     required this.number,
     required this.message,
-    this.senderId = "EgoSms",
+    this.senderId = "Comms",
     this.priority = MessagePriority.HIGHEST,
   });
 
