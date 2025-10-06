@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
-namespace EgoSms.Models;
+namespace Comms.Models;
 
 public class ApiRequest
 {

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace EgoSms.Models;
+namespace Comms.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ApiResponseCode

@@ -1,8 +1,8 @@
-# EgoSmsSDK
+# CommsSDK
 
 Example:
 ```c#
-var sdk = await EgoSmsSdk.Authenticate("user", "password");
+var sdk = await CommsSdk.Authenticate("user", "password");
 var balance1Str = await sdk.GetBalance();
 var balance1 = long.Parse(balance1Str);
 Console.WriteLine($"Balance1: SHS.{balance1}");

@@ -1,6 +1,6 @@
-using EgoSms.Utils;
+using Comms.Utils;
 
-namespace EgoSmsTests;
+namespace CommsTests;
 
 [TestClass]
 public class NumberValidatorTests

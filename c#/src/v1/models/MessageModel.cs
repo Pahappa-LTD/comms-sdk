@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace EgoSms.Models;
+namespace Comms.Models;
 
 public class MessageModel
 {
@@ -18,7 +18,7 @@ public class MessageModel
     {
         Number = number ?? throw new ArgumentNullException(nameof(number));
         Message = message ?? throw new ArgumentNullException(nameof(message));
-        SenderId = senderId ?? "EgoSms";
+        SenderId = senderId ?? "Comms";
         Priority = priority;
     }
 }

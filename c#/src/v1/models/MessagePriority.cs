@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace EgoSms.Models;
+namespace Comms.Models;
 
 public enum MessagePriority
 {

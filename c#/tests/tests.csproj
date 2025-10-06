@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\EgoSmsSdk.csproj" />
+    <ProjectReference Include="..\src\CommsSdk.csproj" />
   </ItemGroup>
 
   <!-- <ItemGroup>
-    <ProjectReference Include="..\EgoSmsSdk.csproj" />
+    <ProjectReference Include="..\CommsSdk.csproj" />
   </ItemGroup> -->
 
   <ItemGroup>
