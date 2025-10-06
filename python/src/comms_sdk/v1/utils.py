@@ -1,5 +1,6 @@
 import re
 from typing import List, Set
+
 from .models import ApiRequest, ApiResponse, ApiResponseCode, UserData
 import requests
 import sys
@@ -34,16 +35,13 @@ class Validator:
     @staticmethod
     def validate_credentials(sdk) -> bool:
         if sdk is None:
-            raise ValueError("EgoSmsSDK instance cannot be null")
+            raise ValueError("CommsSDK instance cannot be null")
 
-        is_api_key = True
-        if sdk.api_key is None:
-            if sdk.password is None or sdk.username is None:
-                raise ValueError("Either API Key or Username and Password must be provided")
-            else:
-                is_api_key = False
+        if sdk.api_key is None and sdk.user_name is None:
+            raise ValueError("API Key and Username must be provided")
+            
         
-        if not Validator._is_valid_credential(sdk, is_api_key):
+        if not Validator._is_valid_credential(sdk):
             print("                                                      _                    \n" +
                   "  /\\     _|_ |_   _  ._ _|_ o  _  _. _|_ o  _  ._    |_ _. o |  _   _| | | \n" +
                   " /--\\ |_| |_ | | (/_ | | |_ | (_ (_|  |_ | (_) | |   | (_| | | (/_ (_| o o \n" +
@@ -51,14 +49,14 @@ class Validator:
                   "\n")
             return False
         
-        print("Validated using an api key" if is_api_key else "Validated using basic auth")
-        sdk.is_authenticated = True
+        print("Validated using an api key")
+        sdk.set_authenticated()
         return True
 
     @staticmethod
-    def _is_valid_credential(sdk, is_api_key: bool) -> bool:
+    def _is_valid_credential(sdk) -> bool:
         client = requests.Session()
-        api_request = ApiRequest(method="Balance",userdata=UserData(sdk.username, sdk.password))
+        api_request = ApiRequest(method="Balance",userdata=UserData(sdk.user_name, sdk.api_key))
         req = api_request.to_dict()
         
         try:

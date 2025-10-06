@@ -1,11 +1,11 @@
 import unittest
-import requests, egosms_sdk
+import requests, comms_sdk
 from unittest.mock import patch, MagicMock
 from io import StringIO
 
-from egosms_sdk.v1.utils import NumberValidator, Validator
-from egosms_sdk.v1.models import ApiRequest, ApiResponse, ApiResponseCode, UserData
-from egosms_sdk import EgoSmsSDK # Needed for Validator tests
+from comms_sdk.v1.utils import NumberValidator, Validator
+from comms_sdk.v1.models import ApiRequest, ApiResponse, ApiResponseCode, UserData
+from comms_sdk import CommsSDK # Needed for Validator tests
 
 class TestNumberValidator(unittest.TestCase):
 
@@ -54,9 +54,9 @@ class TestValidator(unittest.TestCase):
         mock_response.json.return_value = {"Status": "OK", "Message": "Success"}
         mock_post.return_value = mock_response
 
-        sdk = EgoSmsSDK()
+        sdk = CommsSDK()
         sdk._username = "test_user"
-        sdk._password = "test_password"
+        sdk._api_key = "test_password"
 
         with patch('sys.stdout', new=StringIO()) as fake_stdout:
             result = Validator.validate_credentials(sdk)
@@ -72,9 +72,9 @@ class TestValidator(unittest.TestCase):
         mock_response.json.return_value = {"Status": "Failed", "Message": "Invalid credentials"}
         mock_post.return_value = mock_response
 
-        sdk = EgoSmsSDK()
+        sdk = CommsSDK()
         sdk._username = "test_user"
-        sdk._password = "wrong_password"
+        sdk._api_key = "wrong_password"
 
         with patch('sys.stderr', new=StringIO()) as fake_stderr:
             result = Validator.validate_credentials(sdk)
@@ -86,9 +86,9 @@ class TestValidator(unittest.TestCase):
     def test_validate_credentials_http_error(self, mock_post):
         mock_post.side_effect = requests.exceptions.RequestException("Network error")
 
-        sdk = EgoSmsSDK()
+        sdk = CommsSDK()
         sdk._username = "test_user"
-        sdk._password = "test_password"
+        sdk._api_key = "test_password"
 
         with patch('sys.stderr', new=StringIO()) as fake_stderr:
             result = Validator.validate_credentials(sdk)
@@ -97,7 +97,7 @@ class TestValidator(unittest.TestCase):
             self.assertIn("Error validating credentials: Network error", fake_stderr.getvalue())
 
     def test_validate_credentials_no_credentials(self):
-        sdk = EgoSmsSDK()
+        sdk = CommsSDK()
         with self.assertRaises(ValueError) as cm:
             Validator.validate_credentials(sdk)
         self.assertIn("Either API Key or Username and Password must be provided", str(cm.exception))
@@ -106,11 +106,11 @@ class TestValidator(unittest.TestCase):
     def test_validate_credentials_sdk_none(self):
         with self.assertRaises(ValueError) as cm:
             Validator.validate_credentials(None)
-        self.assertIn("EgoSmsSDK instance cannot be null", str(cm.exception))
+        self.assertIn("CommsSDK instance cannot be null", str(cm.exception))
 
     def test_real(self):
-        EgoSmsSDK.use_sandbox()
-        sdk = EgoSmsSDK.authenticate("aganisandbox", "SandBox")
+        CommsSDK.use_sandbox()
+        sdk = CommsSDK.authenticate("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99")
         self.assertIsNotNone(sdk.get_balance())
         self.assertTrue(sdk.send_sms("0712345678","Message 1"))
 

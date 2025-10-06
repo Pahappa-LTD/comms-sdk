@@ -58,6 +58,12 @@ class ApiRequest(JSONSerializable):
     method: str
     userdata: UserData
     msgdata: Optional[List[MessageModel]] = None
+    def to_dict(self):
+        return {
+            "method": self.method,
+            "userdata": self.userdata.to_dict(),
+            "msgdata": [msg.to_dict() for msg in self.msgdata] if self.msgdata else None
+        }
 
 @dataclass
 class ApiResponse(JSONSerializable):

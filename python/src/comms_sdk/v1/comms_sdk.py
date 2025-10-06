@@ -53,7 +53,7 @@ class CommsSDK:
         self._sender_id = sender_id
         return self
 
-    def send_sms(self, numbers, message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGHEST) -> bool:
+    def send_sms(self, numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGHEST) -> bool:
         if isinstance(numbers, str):
             numbers = [numbers]
         

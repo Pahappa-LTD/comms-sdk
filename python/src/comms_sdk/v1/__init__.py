@@ -1,3 +1,3 @@
-from .egosms_sdk import EgoSmsSDK, MessagePriority
+from .comms_sdk import CommsSDK, MessagePriority
 
-__all__ = ['EgoSmsSDK', 'MessagePriority']
+__all__ = ['CommsSDK', 'MessagePriority']
