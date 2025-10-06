@@ -185,9 +185,8 @@ public class CommsSDK {
         }
     }
 
-    public Double getBalance() {
-        ApiResponse response = queryBalance();
-        return response != null ? response.getBalance() : null;
+    public double getBalance() {
+        return queryBalance().getBalance();
     }
 
     @Override

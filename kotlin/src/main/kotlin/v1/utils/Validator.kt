@@ -1,10 +1,8 @@
 package v1.utils;
 
 import org.springframework.http.ResponseEntity
-import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.postForEntity
-import org.springframework.web.client.postForObject
 import v1.CommsSDK
 import v1.CommsSDK.Companion.API_URL
 import v1.CommsSDK.Companion.OBJECT_MAPPER
@@ -17,7 +15,7 @@ import v1.models.UserData
 object Validator {
     fun validateCredentials(sdk: CommsSDK): Boolean {
         if (sdk.apiKey.isEmpty() || sdk.userName.isEmpty()) {
-            throw (IllegalArgumentException("Either API Key or Username and Password must be provided"));
+            throw (IllegalArgumentException("API Key and Username must be provided"));
         }
         if (!isValidCredential(sdk)) {
             println(

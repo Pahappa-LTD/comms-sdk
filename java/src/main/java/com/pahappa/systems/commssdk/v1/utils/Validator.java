@@ -15,15 +15,10 @@ public final class Validator {
         if (sdk == null) {
             throw new IllegalArgumentException("CommsSDK instance cannot be null");
         }
-        boolean isApiKey = true;
-        if (sdk.getApiKey() == null) {
-            if (sdk.getPassword() == null || sdk.getUsername() == null) {
-                throw new IllegalArgumentException("Either API Key or Username and Password must be provided");
-            } else {
-                isApiKey = false;
-            }
+        if (sdk.getApiKey() == null || sdk.getUserName() == null) {
+            throw new IllegalArgumentException("Either API Key or Username and Password must be provided");
         }
-        if (!isValidCredential(sdk, isApiKey)) {
+        if (!isValidCredential(sdk)) {
             System.out.println("                                                      _                    \n" +
                     "  /\\     _|_ |_   _  ._ _|_ o  _  _. _|_ o  _  ._    |_ _. o |  _   _| | | \n" +
                     " /--\\ |_| |_ | | (/_ | | |_ | (_ (_|  |_ | (_) | |   | (_| | | (/_ (_| o o \n" +
@@ -31,17 +26,17 @@ public final class Validator {
                     "\n");
             return false;
         }
-        System.out.println(isApiKey ? "Validated using an api key" : "Validated using basic auth");
+        System.out.println("Validated using an api key");
         sdk.setAuthenticated(true);
         return true;
     }
 
 
-    private static boolean isValidCredential(CommsSDK sdk, boolean isApiKey) {
+    private static boolean isValidCredential(CommsSDK sdk) {
         RestTemplate client = new RestTemplate();
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setMethod("Balance");
-        apiRequest.setUserdata(new UserData(sdk.getUsername(), sdk.getPassword()));
+        apiRequest.setUserdata(new UserData(sdk.getUserName(), sdk.getApiKey()));
         try {
             ResponseEntity<String> res = client.postForEntity(API_URL, apiRequest, String.class);
             ApiResponse apiResponse = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
