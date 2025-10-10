@@ -1,6 +1,6 @@
 [submodule "go"]
 	path = go
-	url = https://github.com/Pahappa-LTD/EgoSmsGoSDK
+	url = https://github.com/Pahappa-LTD/comms-go-sdk
 [submodule "php"]
 	path = php
-	url = https://github.com/Pahappa-LTD/EgoSmsPHPSDK
+	url = https://github.com/Pahappa-LTD/comms-php-sdk
