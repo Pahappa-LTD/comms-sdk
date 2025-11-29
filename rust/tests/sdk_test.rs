@@ -8,7 +8,7 @@ fn test_new() {
 #[test]
 fn test_authenticate() {
     let mut sdk = CommsSDK::new("username", "api_key");
-    sdk.use_sandbox();
+    CommsSDK::use_sandbox();
     let authenticated = sdk.authenticate().unwrap();
     assert!(!authenticated); // not authenticated because that account does not exist on the sandbox
 }
@@ -26,7 +26,7 @@ fn test_send_sms_failure() {
 #[test]
 fn test_send_sms_success() {
     let mut sdk = CommsSDK::new("username", "api_key"); // replace with appropriate credentials
-    sdk.use_sandbox(); // for testing at https://comms-test.pahappa.net/api/v1/json/
+    CommsSDK::use_sandbox(); // for testing at https://comms-test.pahappa.net/api/v1/json/
     sdk.authenticate().unwrap();
     let numbers = vec!["256700000000"];
     let message = "Test message from Rust";
@@ -38,7 +38,7 @@ fn test_send_sms_success() {
 #[test]
 fn test_balance_sandbox() {
     let mut sdk = CommsSDK::new("username", "api_key");
-    sdk.use_sandbox();
+    CommsSDK::use_sandbox();
     let auth = sdk.authenticate();
     assert!(auth.is_ok()); // auth request was successful
     assert!(auth.unwrap()); // provided credentials were correct
@@ -55,4 +55,16 @@ fn test_balance_live() {
     assert!(!auth.unwrap()); // provided credentials were incorrect
     let result = sdk.get_balance();
     assert!(result.is_err());
+}
+
+#[test]
+fn test_use_sandbox_and_live() {
+    use comms_sdk::API_URL;
+    // Test sandbox URL
+    CommsSDK::use_sandbox();
+    assert_eq!(unsafe{ API_URL }, "https://comms-test.pahappa.net/api/v1/json/");
+
+    // Test live server URL
+    CommsSDK::use_live_server();
+    assert_eq!(unsafe{ API_URL }, "https://comms.egosms.co/api/v1/json/");
 }

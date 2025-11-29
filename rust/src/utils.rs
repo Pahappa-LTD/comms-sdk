@@ -7,8 +7,7 @@ use regex::Regex;
 use reqwest::blocking::Client;
 
 use crate::{
-    CommsSDK,
-    models::{ApiRequest, ApiResponse, ApiResponseCode, UserData},
+    API_URL, CommsSDK, models::{ApiRequest, ApiResponse, ApiResponseCode, UserData}
 };
 
 pub fn validate_numbers<S: AsRef<str>>(numbers: Vec<S>) -> Vec<String> {
@@ -62,7 +61,7 @@ fn is_valid_credential(sdk: &mut CommsSDK) -> bool {
         userdata: UserData::new(&sdk.user_name, &sdk.api_key),
         message_data: None,
     };
-    return match client.post(&sdk.api_url).json(&request).send() {
+    return match client.post(unsafe { API_URL }).json(&request).send() {
         Ok(response) => {
             match response.json::<ApiResponse>() {
                 Ok(response) => {

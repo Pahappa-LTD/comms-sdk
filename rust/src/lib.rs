@@ -8,14 +8,13 @@ use utils::{validate_credentials, validate_numbers};
 
 use crate::models::ApiResponseCode;
 
-const API_URL: &str = "https://comms.egosms.co/api/v1/json/";
+pub static mut API_URL: &str = "https://comms.egosms.co/api/v1/json/";
 
 pub struct CommsSDK {
     user_name: String,
     api_key: String,
     sender_id: String,
     is_authenticated: bool,
-    api_url: String,
     client: Client,
 }
 
@@ -26,7 +25,6 @@ impl CommsSDK {
             api_key: api_key.as_ref().to_string(),
             sender_id: "EgoSMS".to_string(),
             is_authenticated: false,
-            api_url: API_URL.to_string(),
             client: Client::new(),
         }
     }
@@ -42,12 +40,16 @@ impl CommsSDK {
         self
     }
 
-    pub fn use_sandbox(&mut self) {
-        self.api_url = "https://comms-test.pahappa.net/api/v1/json".to_string();
+    pub fn use_sandbox() {
+        unsafe {
+            API_URL = "https://comms-test.pahappa.net/api/v1/json/";
+        }
     }
 
-    pub fn use_live_server(&mut self) {
-        self.api_url = "https://comms.egosms.co/api/v1/json".to_string();
+    pub fn use_live_server() {
+        unsafe {
+            API_URL = "https://comms.egosms.co/api/v1/json/";
+        }
     }
 
     pub fn set_authenticated(&mut self) {
@@ -154,7 +156,7 @@ impl CommsSDK {
             message_data: message_models,
         };
 
-        match self.client.post(&self.api_url).json(&api_request).send() {
+        match self.client.post(unsafe { API_URL }).json(&api_request).send() {
             Ok(response) => match response.json::<ApiResponse>() {
                 Ok(api_response) => Ok(api_response),
                 Err(e) => Err(Error::msg(format!("Failed to send SMS: {}", e))),
@@ -176,7 +178,7 @@ impl CommsSDK {
             message_data: None,
         };
 
-        match self.client.post(&self.api_url).json(&api_request).send() {
+        match self.client.post(unsafe { API_URL }).json(&api_request).send() {
             Ok(response) => match response.json::<ApiResponse>() {
                 // response has reqwest::Error
                 Ok(api_response) => Ok(api_response),
