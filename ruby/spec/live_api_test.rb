@@ -9,8 +9,8 @@
 require_relative '../lib/comms_sdk'
 
 # Test credentials
-USERNAME = "agabu-idaniel"
-API_KEY = "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99"
+USERNAME = "sandbox"
+API_KEY = "sandbox35"
 TEST_PHONE = "+256772123456"
 
 puts "🧪 CommsSdk Ruby Live API Tests"

@@ -11,7 +11,7 @@ import 'utils/number_validator.dart';
 import 'utils/validator.dart';
 
 class CommsSDK {
-  static String _apiUrl = 'http://176.58.101.43:8080/communications/api/v1/json/';
+  static String _apiUrl = 'https://comms.egosms.co/api/v1/json/';
   static String getApiUrl() => _apiUrl;
 
   String? userName;
@@ -35,11 +35,11 @@ class CommsSDK {
   }
 
   static void useSandBox() {
-    _apiUrl = 'http://176.58.101.43:8080/communications/api/v1/json';
+    _apiUrl = 'https://comms-test.pahappa.net/api/v1/json';
   }
 
   static void useLiveServer() {
-    _apiUrl = 'http://176.58.101.43:8080/communications/api/v1/json';
+    _apiUrl = 'https://comms.egosms.co/api/v1/json';
   }
 
   void setAuthenticated() {

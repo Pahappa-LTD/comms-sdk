@@ -10,10 +10,10 @@ RSpec.describe CommsSdk do
   describe '.authenticate' do
     it 'provides convenience method to access V1 SDK' do
       allow(CommsSdk::V1::CommsSDK).to receive(:authenticate)
-        .with("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99")
+        .with("username", "api_key")
         .and_return("mock_sdk")
       
-      result = CommsSdk.authenticate("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99")
+      result = CommsSdk.authenticate("username", "api_key")
       expect(result).to eq("mock_sdk")
     end
   end

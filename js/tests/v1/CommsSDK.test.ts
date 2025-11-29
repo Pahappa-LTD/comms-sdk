@@ -3,10 +3,12 @@ import { MessagePriority } from '../../src/v1/models/MessagePriority';
 
 describe('CommsSDK', () => {
     let sdk: CommsSDK;
+    const username = "sandbox" // replace with your sandbox credentials
+    const apiKey = "sandbox35" // replace with your sandbox credentials
 
     beforeEach(() => {
         CommsSDK.useSandBox();
-        sdk = CommsSDK.authenticate('agabu-idaniel', 'dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99');
+        sdk = CommsSDK.authenticate(username, apiKey);
     });
 
     test('testSendSMSToSingleNumber', async () => {

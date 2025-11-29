@@ -17,7 +17,7 @@ class CommsSDK {
         private set
 
     companion object {
-        var API_URL = "http://176.58.101.43:8080/communications/api/v1/json/"
+        var API_URL = "https://comms.egosms.co/api/v1/json/"
         val OBJECT_MAPPER = ObjectMapper()
         val client = RestTemplate()
 
@@ -32,21 +32,21 @@ class CommsSDK {
         /**
          * Uses the sandbox url - useful for testing scenarios.
          * <br></br>
-         * Make an account at "[sandbox.egosms.co](http://sandbox.egosms.co)" to use the sandbox.
+         * Make an account at "[comms-test.pahappa.net](https://comms-test.pahappa.net)" to use the sandbox.
          * Use [useLiveServer] for the live server.
          */
         fun useSandBox() {
-            API_URL = "http://176.58.101.43:8080/communications/api/v1/json"
+            API_URL = "https://comms-test.pahappa.net/api/v1/json"
         }
 
         /**
          * Uses the live url - useful for actual messaging scenarios.
          * <br></br>
-         * Make an account at "[www.egosms.co](http://www.egosms.co)" to use the live server.
+         * Make an account at "[comms.egosms.co](https://comms.egosms.co)" to use the live server.
          * Use [useSandBox] for the sandbox server.
          */
         fun useLiveServer() {
-            API_URL = "http://176.58.101.43:8080/communications/api/v1/json"
+            API_URL = "https://comms.egosms.co/api/v1/json"
         }
 
     }

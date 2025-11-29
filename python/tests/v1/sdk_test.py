@@ -19,24 +19,19 @@ class TestCommsSDK(unittest.TestCase):
         mock_validate_credentials.return_value = True
         sdk = CommsSDK.authenticate("test_user", "test_password")
         self.assertIsNotNone(sdk)
-        self.assertEqual(sdk.username, "test_user")
-        self.assertEqual(sdk.password, "test_password")
+        self.assertEqual(sdk.user_name, "test_user")
+        self.assertEqual(sdk.api_key, "test_password")
         self.assertTrue(sdk.is_authenticated)
         mock_validate_credentials.assert_called_once_with(sdk)
 
-    def test_authenticate_api_key_not_supported(self):
-        with self.assertRaises(NotImplementedError) as cm:
-            CommsSDK.authenticate_with_api_key("some_api_key")
-        self.assertIn("API Key authentication is not supported", str(cm.exception))
-
     def test_use_sandbox(self):
         CommsSDK.use_sandbox()
-        self.assertEqual(CommsSDK.API_URL, "http://sandbox.egosms.co/api/v1/json/")
+        self.assertEqual(CommsSDK.API_URL, "http://comms-test.pahappa.net/api/v1/json/")
 
     def test_use_live_server(self):
         CommsSDK.use_sandbox() # Set to sandbox first
         CommsSDK.use_live_server()
-        self.assertEqual(CommsSDK.API_URL, "https://www.egosms.co/api/v1/json/")
+        self.assertEqual(CommsSDK.API_URL, "https://comms.egosms.co/api/v1/json/")
 
     def test_with_sender_id(self):
         sdk = CommsSDK()

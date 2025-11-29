@@ -8,7 +8,7 @@ use utils::{validate_credentials, validate_numbers};
 
 use crate::models::ApiResponseCode;
 
-const API_URL: &str = "http://176.58.101.43:8080/communications/api/v1/json/";
+const API_URL: &str = "https://comms.egosms.co/api/v1/json/";
 
 pub struct CommsSDK {
     user_name: String,
@@ -43,11 +43,11 @@ impl CommsSDK {
     }
 
     pub fn use_sandbox(&mut self) {
-        self.api_url = "http://176.58.101.43:8080/communications/api/v1/json".to_string();
+        self.api_url = "https://comms-test.pahappa.net/api/v1/json".to_string();
     }
 
     pub fn use_live_server(&mut self) {
-        self.api_url = "http://176.58.101.43:8080/communications/api/v1/json".to_string();
+        self.api_url = "https://comms.egosms.co/api/v1/json".to_string();
     }
 
     pub fn set_authenticated(&mut self) {

@@ -13,7 +13,9 @@ public class CommsSDKTest {
     @Test
     public void checkFunctionality() {
 //        CommsSDK.useSandBox();
-        CommsSDK sdk = CommsSDK.authenticate("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99");
+        String userName = "sandbox";
+        String apiKey = "sandbox35";
+        CommsSDK sdk = CommsSDK.authenticate(userName, apiKey);
         double balance1 = sdk.getBalance();
         System.out.println("Balance1: SHS." + balance1);
         sdk.sendSMS("234", "testing");

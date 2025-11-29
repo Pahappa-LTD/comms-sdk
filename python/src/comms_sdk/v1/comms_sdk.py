@@ -5,7 +5,7 @@ from .models import ApiRequest, ApiResponse, ApiResponseCode, MessageModel, Mess
 from .utils import NumberValidator, Validator
 
 class CommsSDK:
-    API_URL = "http://176.58.101.43:8080/communications/api/v1/json/"
+    API_URL = "https://comms.egosms.co/api/v1/json/"
 
     def __init__(self):
         self._api_key: Optional[str] = None
@@ -43,11 +43,11 @@ class CommsSDK:
 
     @staticmethod
     def use_sandbox():
-        CommsSDK.API_URL = "http://176.58.101.43:8080/communications/api/v1/json"
+        CommsSDK.API_URL = "https://comms-test.pahappa.net/api/v1/json"
 
     @staticmethod
     def use_live_server():
-        CommsSDK.API_URL = "http://176.58.101.43:8080/communications/api/v1/json"
+        CommsSDK.API_URL = "https://comms.egosms.co/api/v1/json"
 
     def with_sender_id(self, sender_id: str):
         self._sender_id = sender_id
@@ -56,13 +56,13 @@ class CommsSDK:
     def send_sms(self, numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGHEST) -> bool:
         if isinstance(numbers, str):
             numbers = [numbers]
-        
+
         api_response = self.query_send_sms(numbers, message, sender_id or self._sender_id, priority)
-        
+
         if api_response is None:
             print("Failed to get a response from the server.")
             return False
-        
+
         if api_response.Status == ApiResponseCode.OK.value:
             print("SMS sent successfully.")
             print(f"MessageFollowUpUniqueCode: {api_response.MsgFollowUpUniqueCode}")
@@ -76,31 +76,31 @@ class CommsSDK:
     def query_send_sms(self, numbers: List[str], message: str, sender_id: str, priority: MessagePriority) -> Optional[ApiResponse]:
         if self._sdk_not_authenticated():
             return None
-        
+
         if not numbers:
             raise ValueError("Numbers list cannot be empty")
         if not message:
             raise ValueError("Message cannot be empty")
         if len(message) == 1:
             raise ValueError("Message cannot be a single character")
-        
+
         if not sender_id or sender_id.strip() == "":
             sender_id = self._sender_id
         if sender_id and len(sender_id) > 11:
             print("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.")
-        
+
         numbers = NumberValidator.validate_numbers(numbers)
         if not numbers:
             print("No valid phone numbers provided. Please check inputs.", file=sys.stderr)
             return None
-        
+
         api_request = ApiRequest(method="SendSms", userdata=UserData(self._user_name, self._api_key))
         message_models = []
         for num in numbers:
             message_model = MessageModel(number=num, message=message, senderid=sender_id, priority=priority.value)
             message_models.append(message_model)
         api_request.msgdata = message_models
-        
+
         try:
             res = self._client.post(CommsSDK.API_URL, json=api_request.to_dict())
             return ApiResponse(**res.json())
@@ -125,9 +125,9 @@ class CommsSDK:
     def query_balance(self) -> Optional[ApiResponse]:
         if self._sdk_not_authenticated():
             return None
-        
+
         api_request = ApiRequest(method="Balance", userdata=UserData(self._user_name, self._api_key))
-        
+
         try:
             res = self._client.post(CommsSDK.API_URL, json=api_request.to_dict())
             return ApiResponse(**res.json())

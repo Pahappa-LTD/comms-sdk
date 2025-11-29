@@ -4,7 +4,9 @@ import 'package:test/test.dart';
 void main() {
   test('checkFunctionality', () async {
     CommsSDK.useSandBox();
-    final sdk = await CommsSDK.authenticate('agabu-idaniel', 'dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99');
+    var username = 'sandbox';
+    var apikey = 'sandbox35';
+    final sdk = await CommsSDK.authenticate(username, apikey);
     final balance1 = await sdk.getBalance() ?? 0;
     print('Balance1: SHS.$balance1');
     await sdk.sendSMS(numbers: ['234'], message: 'testing');

@@ -7,11 +7,14 @@ namespace CommsTests {
     [TestClass]
     public class CommsSdkTests
     {
+
         [TestMethod]
         public async Task CheckFunctionality()
         {
             CommsSdk.UseSandBox();
-            var sdk = await CommsSdk.Authenticate("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99");
+            string UserName = "sandbox";
+            string ApiKey = "sandbox35";
+            var sdk = await CommsSdk.Authenticate(UserName, ApiKey);
             var balance1 = await sdk.GetBalance();
             Assert.IsNotNull(balance1);
             Console.WriteLine($"Balance1: SHS.{balance1}");

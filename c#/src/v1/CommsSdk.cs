@@ -12,7 +12,7 @@ namespace Comms
 {
     public class CommsSdk
     {
-        public static string ApiUrl { get; private set; } = "http://176.58.101.43:8080/communications/api/v1/json/";
+        public static string ApiUrl { get; private set; } = "https://comms.egosms.co/api/v1/json/";
         private static readonly HttpClient Client = new();
 
         public string? UserName { get; private set; }
@@ -35,12 +35,12 @@ namespace Comms
 
         public static void UseSandBox()
         {
-            ApiUrl = "http://176.58.101.43:8080/communications/api/v1/json";
+            ApiUrl = "https://comms-test.pahappa.net/api/v1/json";
         }
 
         public static void UseLiveServer()
         {
-            ApiUrl = "http://176.58.101.43:8080/communications/api/v1/json";
+            ApiUrl = "https://comms.egosms.co/api/v1/json";
         }
 
         public void SetAuthenticated()
@@ -108,7 +108,7 @@ namespace Comms
 
             if (string.IsNullOrEmpty(message))
                 throw new ArgumentException("Message cannot be empty");
-        
+
             if (message.Length == 1)
                 throw new ArgumentException("Message cannot be a single character");
 

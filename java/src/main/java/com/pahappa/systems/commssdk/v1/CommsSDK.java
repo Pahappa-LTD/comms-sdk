@@ -15,7 +15,7 @@ import java.util.List;
 
 public class CommsSDK {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    public static String API_URL = "http://176.58.101.43:8080/communications/api/v1/json/";
+    public static String API_URL = "https://comms.egosms.co/api/v1/json/";
 
     @Getter
     private String userName;
@@ -42,23 +42,24 @@ public class CommsSDK {
     /**
      * Uses the sandbox url - useful for testing scenarios.
      * <br/>
-     * Make an account at "<a href="http://sandbox.egosms.co">sandbox.egosms.co</a>" to use the sandbox.
+     * Make an account at "<a href="http://comms-test.pahappa.net">comms-test.pahappa.net</a>" to use the sandbox.
      * Use {@link CommsSDK#useLiveServer()} for the live server.
      */
     public static void useSandBox() {
-        API_URL = "http://176.58.101.43:8080/communications/api/v1/json";
+        API_URL = "https://comms-test.pahappa.net/api/v1/json";
     }
 
     /**
      * Uses the live url - useful for actual messaging scenarios.
      * <br/>
-     * Make an account at "<a href="http://www.egosms.co">www.egosms.co</a>" to use the live server.
+     * Make an account at "<a href="http://comms.egosms.co">comms.egosms.co</a>" to use the live server.
      * Use {@link CommsSDK#useSandBox()} for the sandbox server.
      */
     public static void useLiveServer() {
-        API_URL = "http://176.58.101.43:8080/communications/api/v1/json";
+        API_URL = "https://comms.egosms.co/api/v1/json";
     }
 
+    /**Not to be called manually!! */
     public void setAuthenticated() {
         this.isAuthenticated = true;
     }

@@ -9,7 +9,7 @@ require_relative 'utils'
 module CommsSdk
   module V1
     class CommsSDK
-      API_URL = "http://176.58.101.43:8080/communications/api/v1/json/"
+      API_URL = "https://comms-test.pahappa.net/api/v1/json/"
 
       attr_reader :api_key, :user_name, :sender_id, :is_authenticated
 
@@ -30,12 +30,12 @@ module CommsSdk
 
       def self.use_sandbox
         remove_const(:API_URL) if const_defined?(:API_URL)
-        const_set(:API_URL, "http://176.58.101.43:8080/communications/api/v1/json")
+        const_set(:API_URL, "https://comms-test.pahappa.net/api/v1/json")
       end
 
       def self.use_live_server
         remove_const(:API_URL) if const_defined?(:API_URL)
-        const_set(:API_URL, "http://176.58.101.43:8080/communications/api/v1/json")
+        const_set(:API_URL, "https://comms-test.pahappa.net/api/v1/json")
       end
 
       def set_authenticated

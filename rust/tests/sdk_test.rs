@@ -2,20 +2,20 @@ use comms_sdk::CommsSDK;
 
 #[test]
 fn test_new() {
-    let _sdk = CommsSDK::new("username", "password");
+    let _sdk = CommsSDK::new("username", "api_key");
 }
 
 #[test]
 fn test_authenticate() {
-    let mut sdk = CommsSDK::new("username", "password");
+    let mut sdk = CommsSDK::new("username", "api_key");
     sdk.use_sandbox();
-    let result = sdk.authenticate().unwrap();
-    assert!(!result);
+    let authenticated = sdk.authenticate().unwrap();
+    assert!(!authenticated); // not authenticated because that account does not exist on the sandbox
 }
 
 #[test]
 fn test_send_sms_failure() {
-    let mut sdk = CommsSDK::new("username", "password");
+    let mut sdk = CommsSDK::new("username", "api_key");
     sdk.authenticate().unwrap();
     let numbers = vec!["256700000000"];
     let message = "Test message";
@@ -25,8 +25,8 @@ fn test_send_sms_failure() {
 
 #[test]
 fn test_send_sms_success() {
-    let mut sdk = CommsSDK::new("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99");
-    sdk.use_sandbox(); // for testing at http://sandbox.egosms.co/api/v1/json/
+    let mut sdk = CommsSDK::new("username", "api_key"); // replace with appropriate credentials
+    sdk.use_sandbox(); // for testing at https://comms-test.pahappa.net/api/v1/json/
     sdk.authenticate().unwrap();
     let numbers = vec!["256700000000"];
     let message = "Test message from Rust";
@@ -37,7 +37,7 @@ fn test_send_sms_success() {
 
 #[test]
 fn test_balance_sandbox() {
-    let mut sdk = CommsSDK::new("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99");
+    let mut sdk = CommsSDK::new("username", "api_key");
     sdk.use_sandbox();
     let auth = sdk.authenticate();
     assert!(auth.is_ok()); // auth request was successful
@@ -49,7 +49,7 @@ fn test_balance_sandbox() {
 
 #[test]
 fn test_balance_live() {
-    let mut sdk = CommsSDK::new("live_agani", "live_password");
+    let mut sdk = CommsSDK::new("username", "api_key");
     let auth = sdk.authenticate();
     assert!(auth.is_ok()); // auth request was successful
     assert!(!auth.unwrap()); // provided credentials were incorrect
