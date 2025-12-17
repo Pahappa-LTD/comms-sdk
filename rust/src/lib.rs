@@ -19,20 +19,18 @@ pub struct CommsSDK {
 }
 
 impl CommsSDK {
-    pub fn new<S: AsRef<str>>(user_name: S, api_key: S) -> Self {
-        Self {
+    /// authenticates and validates credentials
+    pub fn authenticate<S: AsRef<str>>(user_name: S, api_key: S) -> Self {
+        let mut sdk = Self {
             user_name: user_name.as_ref().to_string(),
             api_key: api_key.as_ref().to_string(),
             sender_id: "EgoSMS".to_string(),
             is_authenticated: false,
             client: Client::new(),
-        }
-    }
-
-    /// authenticates and validates credentials
-    pub fn authenticate(&mut self) -> Result<bool, anyhow::Error> {
-        self.is_authenticated = validate_credentials(self)?;
-        Ok(self.is_authenticated)
+        };
+        sdk.is_authenticated = validate_credentials(&mut sdk)
+            .expect("Could not validate credentials");
+        sdk
     }
 
     pub fn with_sender_id(mut self, sender_id: &str) -> Self {
@@ -210,6 +208,10 @@ impl CommsSDK {
             ));
         }
         Ok(())
+    }
+
+    pub fn is_authenticated(&self) -> bool {
+        self.is_authenticated
     }
 }
 
