@@ -1,4 +1,4 @@
 @echo off
 pip install build twine
 python -m build
-twine upload dist/*
+python -m twine upload dist/* -p "publishing-api-token"
