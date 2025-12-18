@@ -6,7 +6,7 @@ requires = ["setuptools"]
 name = "comms_sdk"
 version = "1.0.0"
 authors = [{name = "Pahappa Limited", email = "systems@pahappa.com"}]
-description = "EgoSMS Python SDK"
+description = "Comms Platform Python SDK"
 license = "MIT"
 dependencies = ["requests"]
 readme = "README.md"

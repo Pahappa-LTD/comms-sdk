@@ -2,15 +2,15 @@
 
 ```python
 # install the package
-pip install egosms_sdk
+pip install comms-sdk
 # Or for dev "pip install ."
 
 
 # import in your project
-from egosms_sdk.v1 import EgoSmsSDK, MessagePriority
+from comms_sdk.v1 import CommsSDK, MessagePriority
 
 # use
-EgoSmsSDK.authenticate("username", "password")
-EgoSmsSDK.send_sms("0712345678", "Message to send")
+CommsSDK.authenticate("username", "password")
+CommsSDK.send_sms("0712345678", "Message to send")
 # send_sms(self, numbers: List[str] | str, message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGHEST)
 ```
