@@ -6,7 +6,7 @@ use std::{
 use regex::Regex;
 use reqwest::blocking::Client;
 
-use crate::{
+use super::{
     API_URL, CommsSDK, models::{ApiRequest, ApiResponse, ApiResponseCode, UserData}
 };
 

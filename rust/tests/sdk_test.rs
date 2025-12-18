@@ -1,4 +1,4 @@
-use comms_sdk::CommsSDK;
+use comms_sdk::v1::CommsSDK;
 
 #[test]
 fn test_new() {
@@ -52,7 +52,7 @@ fn test_balance_live() {
 
 #[test]
 fn test_use_sandbox_and_live() {
-    use comms_sdk::API_URL;
+    use comms_sdk::v1::API_URL;
     // Test sandbox URL
     CommsSDK::use_sandbox();
     assert_eq!(unsafe{ API_URL }, "https://comms-test.pahappa.net/api/v1/json/");
