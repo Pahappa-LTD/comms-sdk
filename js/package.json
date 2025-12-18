@@ -9,8 +9,13 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist/*", "README.md"
+    "dist/*",
+    "README.md"
   ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./v1": "./dist/v1/index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
