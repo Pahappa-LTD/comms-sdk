@@ -4,8 +4,13 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist/*", "README.md"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
