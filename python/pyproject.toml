@@ -4,7 +4,7 @@ requires = ["setuptools"]
 
 [project]
 name = "comms_sdk"
-version = "1.0.0"
+version = "1.0.1"
 authors = [{name = "Pahappa Limited", email = "systems@pahappa.com"}]
 description = "Comms Platform Python SDK"
 license = "MIT"
