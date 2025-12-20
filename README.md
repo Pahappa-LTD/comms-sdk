@@ -91,7 +91,9 @@ sdk.sendSMS("+256700000001", "Hello from CommsSDK!")
 <summary>JavaScript/TypeScript</summary>
 
 ```typescript
-import { CommsSDK } from 'comms-sdk'
+import { v1 } from 'comms-sdk'
+// or
+import { CommsSDK } from 'comms-sdk/v1'
 const sdk = CommsSDK.authenticate('your_username', 'your_api_key')
 await sdk.sendSMS('+256700000001', 'Hello from CommsSDK!')
 ```
