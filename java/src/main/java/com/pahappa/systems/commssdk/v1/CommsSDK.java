@@ -10,9 +10,15 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
+import static com.pahappa.systems.commssdk.v1.utils.Log.println;
 
 /**
  * Main entry point for interacting with the CommsSDK.
@@ -41,7 +47,7 @@ public class CommsSDK {
     @Setter
     private String senderId = "EgoSMS";
 
-    @Setter
+    @Getter
     private boolean isAuthenticated = false;
 
     private final RestTemplate client = new RestTemplate();
@@ -63,7 +69,7 @@ public class CommsSDK {
         CommsSDK sdk = new CommsSDK();
         sdk.userName = userName;
         sdk.apiKey = apiKey;
-        Validator.validateCredentials(sdk);
+        sdk.isAuthenticated = Validator.validateCredentials(sdk);
         return sdk;
     }
 
@@ -88,14 +94,6 @@ public class CommsSDK {
     }
 
     /**
-     * Marks the SDK as authenticated.
-     * <b>Not to be called manually!</b>
-     */
-    public void setAuthenticated() {
-        this.isAuthenticated = true;
-    }
-
-    /**
      * Sets the sender ID for outgoing messages.
      *
      * @param senderId Sender ID (max 11 characters).
@@ -114,12 +112,7 @@ public class CommsSDK {
      * @return true if sent successfully, false otherwise.
      */
     public boolean sendSMS(String number, String message) {
-        return sendSMS(
-                Collections.singletonList(number),
-                message,
-                senderId,
-                MessagePriority.HIGHEST
-        );
+        return sendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGHEST);
     }
 
     /**
@@ -131,12 +124,7 @@ public class CommsSDK {
      * @return true if sent successfully, false otherwise.
      */
     public boolean sendSMS(String number, String message, String senderId) {
-        return sendSMS(
-                Collections.singletonList(number),
-                message,
-                senderId,
-                MessagePriority.HIGHEST
-        );
+        return sendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGHEST);
     }
 
     /**
@@ -148,18 +136,8 @@ public class CommsSDK {
      * @param priority Message priority.
      * @return true if sent successfully, false otherwise.
      */
-    public boolean sendSMS(
-            String number,
-            String message,
-            String senderId,
-            MessagePriority priority
-    ) {
-        return sendSMS(
-                Collections.singletonList(number),
-                message,
-                senderId,
-                priority
-        );
+    public boolean sendSMS(String number, String message, String senderId, MessagePriority priority) {
+        return sendSMS(Collections.singletonList(number), message, senderId, priority);
     }
 
     /**
@@ -170,17 +148,8 @@ public class CommsSDK {
      * @param priority Message priority.
      * @return true if sent successfully, false otherwise.
      */
-    public boolean sendSMS(
-            String number,
-            String message,
-            MessagePriority priority
-    ) {
-        return sendSMS(
-                Collections.singletonList(number),
-                message,
-                senderId,
-                priority
-        );
+    public boolean sendSMS(String number, String message, MessagePriority priority) {
+        return sendSMS(Collections.singletonList(number), message, senderId, priority);
     }
 
     /**
@@ -202,11 +171,7 @@ public class CommsSDK {
      * @param senderId Sender ID.
      * @return true if sent successfully, false otherwise.
      */
-    public boolean sendSMS(
-            List<String> numbers,
-            String message,
-            String senderId
-    ) {
+    public boolean sendSMS(List<String> numbers, String message, String senderId) {
         return sendSMS(numbers, message, senderId, MessagePriority.HIGHEST);
     }
 
@@ -218,11 +183,7 @@ public class CommsSDK {
      * @param priority Message priority.
      * @return true if sent successfully, false otherwise.
      */
-    public boolean sendSMS(
-            List<String> numbers,
-            String message,
-            MessagePriority priority
-    ) {
+    public boolean sendSMS(List<String> numbers, String message, MessagePriority priority) {
         return sendSMS(numbers, message, senderId, priority);
     }
 
@@ -235,36 +196,22 @@ public class CommsSDK {
      * @param priority Message priority.
      * @return true if sent successfully, false otherwise.
      */
-    public boolean sendSMS(
-            List<String> numbers,
-            String message,
-            String senderId,
-            MessagePriority priority
-    ) {
-        ApiResponse apiResponse = querySendSMS(
-                numbers,
-                message,
-                senderId,
-                priority
-        );
+    public boolean sendSMS(List<String> numbers, String message, String senderId, MessagePriority priority) {
+        ApiResponse apiResponse = querySendSMS(numbers, message, senderId, priority);
         if (apiResponse == null) {
-            System.out.println("Failed to get a response from the server.");
+            println("Failed to get a response from the server.");
             return false;
         }
         switch (apiResponse.getStatus()) {
             case OK:
-                System.out.println("SMS sent successfully.");
-                System.out.println(
-                        "MessageFollowUpUniqueCode: " + apiResponse.getMessageFollowUpCode()
-                );
+                println("SMS sent successfully.");
+                println("MessageFollowUpUniqueCode: " + apiResponse.getMessageFollowUpCode());
                 return true;
             case Failed:
-                System.out.println("Failed: " + apiResponse.getMessage());
+                println("Failed: " + apiResponse.getMessage());
                 return false;
             default:
-                throw new RuntimeException(
-                        "Unexpected response status: " + apiResponse.getStatus()
-                );
+                throw new RuntimeException("Unexpected response status: " + apiResponse.getStatus());
         }
     }
 
@@ -277,12 +224,7 @@ public class CommsSDK {
      * @param priority Message priority.
      * @return ApiResponse object with status and details, or null on error.
      */
-    public ApiResponse querySendSMS(
-            List<String> numbers,
-            String message,
-            String senderId,
-            MessagePriority priority
-    ) {
+    public ApiResponse querySendSMS(List<String> numbers, String message, String senderId, MessagePriority priority) {
         if (sdkNotAuthenticated()) return null;
         if (numbers == null || numbers.isEmpty()) {
             throw new IllegalArgumentException("Numbers list cannot be empty");
@@ -291,26 +233,20 @@ public class CommsSDK {
             throw new IllegalArgumentException("Message cannot be empty");
         }
         if (message.length() == 1) {
-            throw new IllegalArgumentException(
-                    "Message cannot be a single character"
-            );
+            throw new IllegalArgumentException("Message cannot be a single character");
         }
         if (senderId == null || senderId.trim().isEmpty()) {
             senderId = this.senderId;
         }
         if (senderId != null && senderId.length() > 11) {
-            System.out.println(
-                    "Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages."
-            );
+            println("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.");
         }
         if (priority == null) {
             priority = MessagePriority.HIGHEST;
         }
         numbers = NumberValidator.validateNumbers(numbers);
         if (numbers.isEmpty()) {
-            System.err.println(
-                    "No valid phone numbers provided. Please check inputs."
-            );
+            println("No valid phone numbers provided. Please check inputs.");
             return null;
         }
         ApiRequest apiRequest = new ApiRequest();
@@ -326,23 +262,24 @@ public class CommsSDK {
         }
         apiRequest.setMessageData(messageModels);
         apiRequest.setUserdata(new UserData(userName, apiKey));
-        ResponseEntity<String> res = client.postForEntity(
-                API_URL,
-                apiRequest,
-                String.class
-        );
+        ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
         try {
             return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
         } catch (Exception e) {
-            System.err.println("Failed to send SMS: " + e.getMessage());
+            println("Failed to send SMS: " + e.getMessage());
             try {
-                System.err.println(
-                        "Request: " + OBJECT_MAPPER.writeValueAsString(apiRequest)
-                );
+                println("Request: " + OBJECT_MAPPER.writeValueAsString(apiRequest));
             } catch (Exception ignored) {
             }
             return null;
         }
+    }
+
+    private @NonNull ResponseEntity<String> sendAsContentTypeJson(ApiRequest apiRequest) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ApiRequest> entity = new HttpEntity<>(apiRequest, headers);
+        return client.postForEntity(API_URL, entity, String.class);
     }
 
     /**
@@ -352,13 +289,10 @@ public class CommsSDK {
      */
     private boolean sdkNotAuthenticated() {
         if (!isAuthenticated) {
-            System.err.println(
-                    "SDK is not authenticated. Please authenticate before performing actions."
-            );
-            System.err.println(
-                    "Attempting to re-authenticate with provided credentials..."
-            );
-            return !Validator.validateCredentials(this);
+            println("SDK is not authenticated. Please authenticate before performing actions.");
+            println("Attempting to re-authenticate with provided credentials...");
+            isAuthenticated = Validator.validateCredentials(this);
+            return !isAuthenticated;
         }
         return false;
     }
@@ -376,11 +310,7 @@ public class CommsSDK {
         apiRequest.setMethod("Balance");
         apiRequest.setUserdata(new UserData(userName, apiKey));
         try {
-            ResponseEntity<String> res = client.postForEntity(
-                    API_URL,
-                    apiRequest,
-                    String.class
-            );
+            ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
             return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get balance: " + e.getMessage(), e);
