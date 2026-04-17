@@ -98,6 +98,7 @@
         <extensions>true</extensions>
         <configuration>
           <publishingServerId>central</publishingServerId>
+          <deploymentName>Comms SDK v${version}</deploymentName>
         </configuration>
       </plugin>
       <plugin>
