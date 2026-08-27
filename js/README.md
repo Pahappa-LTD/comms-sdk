@@ -1,8 +1,7 @@
-CommsSDK/js/README.md
 # CommsSDK for JavaScript/TypeScript
 
-**Version:** 1.0.1
-**Package:** `comms-sdk` (TypeScript/JavaScript)
+**Version:** 1.0.3
+**Package:** `@pahappalimited/comms-sdk` (TypeScript/JavaScript)
 
 A modern, type-safe SDK for sending SMS and querying balances via the EgoSMS Comms API.
 Supports both Node.js and browser environments (with appropriate polyfills for HTTP).
@@ -12,11 +11,11 @@ Supports both Node.js and browser environments (with appropriate polyfills for H
 ## Installation
 
 ```sh
-npm install comms-sdk
+npm install @pahappalimited/comms-sdk
 # or
-yarn add comms-sdk
+yarn add @pahappalimited/comms-sdk
 # or
-pnpm add comms-sdk
+pnpm add @pahappalimited/comms-sdk
 ```
 
 ---
@@ -26,7 +25,7 @@ pnpm add comms-sdk
 ### Basic Example
 
 ```typescript
-import { CommsSDK, MessagePriority } from "comms-sdk";
+import { CommsSDK, MessagePriority } from "@pahappalimited/comms-sdk";
 
 // Authenticate
 const sdk = CommsSDK.authenticate("your_username", "your_api_key");
