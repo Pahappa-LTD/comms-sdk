@@ -1,11 +1,13 @@
 {
   "name": "comms-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "type": "module",
   "scripts": {
     "test": "jest",
-    "build": "tsc",
+    "build": "npm run clean && tsc",
+    "clean": "rm -rf ./dist",
+    "clean-win": "rm -recurse -force ./dist",
     "prepublishOnly": "npm run build"
   },
   "files": [

@@ -1,5 +1,5 @@
-import { CommsSDK } from '../../src/v1/CommsSDK';
-import { MessagePriority } from '../../src/v1/models/MessagePriority';
+import { CommsSDK } from '../../src/';
+import { MessagePriority } from '../../src/';
 
 describe('CommsSDK', () => {
     let sdk: CommsSDK;
