@@ -1,8 +1,11 @@
 {
-  "name": "comms-sdk",
+  "name": "@pahappalimited/comms-sdk",
   "version": "1.0.3",
   "description": "",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "jest",
     "build": "npm run clean && tsc",
