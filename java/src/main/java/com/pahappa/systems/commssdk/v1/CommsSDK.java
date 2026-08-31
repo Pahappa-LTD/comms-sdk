@@ -105,14 +105,14 @@ public class CommsSDK {
     }
 
     /**
-     * Sends an SMS to a single number with default sender ID and highest priority.
+     * Sends an SMS to a single number with default sender ID and priority.
      *
      * @param number  Recipient phone number.
      * @param message Message text.
      * @return true if sent successfully, false otherwise.
      */
     public boolean sendSMS(String number, String message) {
-        return sendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGHEST);
+        return sendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGH);
     }
 
     /**
@@ -124,7 +124,7 @@ public class CommsSDK {
      * @return true if sent successfully, false otherwise.
      */
     public boolean sendSMS(String number, String message, String senderId) {
-        return sendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGHEST);
+        return sendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGH);
     }
 
     /**
@@ -153,14 +153,14 @@ public class CommsSDK {
     }
 
     /**
-     * Sends an SMS to multiple numbers with default sender ID and highest priority.
+     * Sends an SMS to multiple numbers with default sender ID and priority.
      *
      * @param numbers List of recipient phone numbers.
      * @param message Message text.
      * @return true if sent successfully, false otherwise.
      */
     public boolean sendSMS(List<String> numbers, String message) {
-        return sendSMS(numbers, message, senderId, MessagePriority.HIGHEST);
+        return sendSMS(numbers, message, senderId, MessagePriority.HIGH);
     }
 
     /**
@@ -172,7 +172,7 @@ public class CommsSDK {
      * @return true if sent successfully, false otherwise.
      */
     public boolean sendSMS(List<String> numbers, String message, String senderId) {
-        return sendSMS(numbers, message, senderId, MessagePriority.HIGHEST);
+        return sendSMS(numbers, message, senderId, MessagePriority.HIGH);
     }
 
     /**
@@ -242,7 +242,7 @@ public class CommsSDK {
             println("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.");
         }
         if (priority == null) {
-            priority = MessagePriority.HIGHEST;
+            priority = MessagePriority.HIGH;
         }
         numbers = NumberValidator.validateNumbers(numbers);
         if (numbers.isEmpty()) {
