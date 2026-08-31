@@ -6,12 +6,15 @@ use std::{
 use regex::Regex;
 use reqwest::blocking::Client;
 
+use crate::models::PhoneNumbers;
+
 use super::{
     API_URL, CommsSDK, models::{ApiRequest, ApiResponse, ApiResponseCode, UserData}
 };
 
-pub fn validate_numbers<S: AsRef<str>>(numbers: Vec<S>) -> Vec<String> {
+pub fn validate_numbers(numbers: PhoneNumbers) -> Vec<String> {
     let regex = Regex::new(r"^\+?(0|\d{3})\d{9}$").unwrap();
+    let numbers = numbers.0;
 
     if numbers.is_empty() {
         eprintln!("Number list cannot be null or empty");
@@ -20,7 +23,6 @@ pub fn validate_numbers<S: AsRef<str>>(numbers: Vec<S>) -> Vec<String> {
 
     let mut cleansed: HashSet<String> = HashSet::new();
     for number in numbers {
-        let number = number.as_ref();
         if number.trim().is_empty() {
             eprintln!("Number ({}) cannot be empty!", number);
             continue;
@@ -42,7 +44,7 @@ pub fn validate_numbers<S: AsRef<str>>(numbers: Vec<S>) -> Vec<String> {
     cleansed.into_iter().collect()
 }
 
-pub fn validate_credentials(sdk: &mut CommsSDK) -> Result<bool, Error> {
+pub fn validate_credentials(sdk: &CommsSDK) -> Result<bool, Error> {
     // let mut is_api_key = true;
     if sdk.api_key.trim().is_empty() || sdk.user_name.trim().is_empty() {
         return Err(Error::new(
@@ -54,12 +56,13 @@ pub fn validate_credentials(sdk: &mut CommsSDK) -> Result<bool, Error> {
     Ok(val)
 }
 
-fn is_valid_credential(sdk: &mut CommsSDK) -> bool {
+fn is_valid_credential(sdk: &CommsSDK) -> bool {
     let client = Client::new();
     let request = ApiRequest {
         method: "Balance".into(),
         userdata: UserData::new(&sdk.user_name, &sdk.api_key),
         message_data: None,
+        wallet_type: None,
     };
     return match client.post(unsafe { API_URL }).json(&request).send() {
         Ok(response) => {

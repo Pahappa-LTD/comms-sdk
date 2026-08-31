@@ -2,7 +2,7 @@
 
 A Rust implementation of the CommsSDK for sending SMS and managing communications, following the same patterns as the Python and Ruby reference implementations.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 
 ---
 
@@ -23,12 +23,12 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-comms_sdk = "1.0.1"
+comms_sdk = "1.1.0"
 ```
 
 Or, run:
 
-```sh
+```powershell
 cargo add comms_sdk
 ```
 
@@ -41,9 +41,9 @@ cargo add comms_sdk
 ```rust
 use comms_sdk::v1::{CommsSDK, MessagePriority};
 
-fn main() {
+fn main() -> Result<(), anyhow::Error> {
     // Authenticate with username and API key
-    let mut sdk = CommsSDK::authenticate("your_username", "your_api_key");
+    let sdk = CommsSDK::authenticate("your_username", "your_api_key")?;
 
     // Send SMS to a single number
     let result = sdk.send_sms(vec!["256712345678"], "Hello from Rust!");
@@ -53,12 +53,12 @@ fn main() {
     }
 
     // Send SMS to multiple numbers with custom sender ID and priority
-    let mut sdk = sdk.with_sender_id("MyApp");
+    let sdk = sdk.with_sender_id("MyApp");
     let result = sdk.send_sms_full(
         vec!["256712345678", "256787654321"],
         "Hello to all!",
-        "SenderID",
-        MessagePriority::High,
+        Some("SenderID"),
+        Some(MessagePriority::High),
     );
     match result {
         Ok(success) => println!("Bulk SMS sent: {}", success),
@@ -70,6 +70,8 @@ fn main() {
         Ok(balance) => println!("Balance: {}", balance),
         Err(e) => eprintln!("Error getting balance: {:?}", e),
     }
+
+    Ok(())
 }
 ```
 
@@ -96,8 +98,10 @@ let mut sdk = sdk.with_sender_id("MyCustomSender");
 
 #### Associated Functions / Methods
 
-- `CommsSDK::authenticate(user_name: &str, api_key: &str) -> CommsSDK`
-  - Authenticate and return SDK instance.
+- `CommsSDK::authenticate(user_name: impl AsRef<str>, api_key: impl AsRef<str>) -> Result<CommsSDK, Error>`
+  - Authenticate and return an SDK instance. Errors only if `user_name` or `api_key` is empty, or the
+    credential check itself could not be performed — wrong credentials against a reachable server still
+    return `Ok`, with `is_authenticated()` reporting `false`.
 - `CommsSDK::use_sandbox()`
   - Switch to sandbox environment.
 - `CommsSDK::use_live_server()`
@@ -105,20 +109,25 @@ let mut sdk = sdk.with_sender_id("MyCustomSender");
 
 #### Instance Methods
 
-- `with_sender_id(&self, sender_id: &str) -> CommsSDK`
+- `with_sender_id(self, sender_id: &str) -> CommsSDK`
   - Set sender ID, returns a new SDK instance with the sender ID.
-- `send_sms(&mut self, numbers: Vec<S>, message: T) -> Result<bool, Error>`
-  - Send SMS to one or more numbers, returns boolean.
-- `send_sms_full(&mut self, numbers: Vec<S>, message: T, sender_id: &str, priority: MessagePriority) -> Result<bool, Error>`
-  - Send SMS with custom sender ID and priority, returns boolean.
-- `query_send_sms(&mut self, numbers: Vec<S>, message: T) -> Result<ApiResponse, Error>`
+- `send_sms(&self, numbers: impl Into<PhoneNumbers>, message: impl ToString) -> Result<bool, Error>`
+  - Send SMS to one or more numbers (`&str`, `String`, `Vec<&str>`, or `Vec<String>`), returns boolean.
+- `send_sms_full(&self, numbers: impl Into<PhoneNumbers>, message: impl ToString, sender_id: Option<&str>, priority: Option<MessagePriority>) -> Result<bool, Error>`
+  - Send SMS with an optional custom sender ID and/or priority (`None` falls back to the instance's default
+    sender ID / `MessagePriority::High`), returns boolean.
+- `query_send_sms(&self, numbers: impl Into<PhoneNumbers>, message: impl ToString) -> Result<ApiResponse, Error>`
   - Send SMS and get full API response.
-- `query_send_sms_full(&mut self, numbers: Vec<S>, message: T, sender_id: &str, priority: MessagePriority) -> Result<ApiResponse, Error>`
-  - Send SMS with custom sender ID and priority, get full API response.
-- `get_balance(&mut self) -> Result<f64, Error>`
-  - Get account balance as float.
-- `query_balance(&mut self) -> Result<ApiResponse, Error>`
-  - Get full balance response as ApiResponse.
+- `query_send_sms_full(&self, numbers: impl Into<PhoneNumbers>, message: impl ToString, sender_id: Option<&str>, priority: Option<MessagePriority>) -> Result<ApiResponse, Error>`
+  - Send SMS with an optional custom sender ID and/or priority, get full API response.
+- `get_balance(&self) -> Result<f64, Error>`
+  - Get the local wallet's account balance as float.
+- `get_balance_full(&self, wallet_type: Option<WalletType>) -> Result<f64, Error>`
+  - Get the account balance as float for the given wallet (`None` defaults to `WalletType::Local`).
+- `query_balance(&self) -> Result<ApiResponse, Error>`
+  - Get the local wallet's full balance response as ApiResponse.
+- `query_balance_full(&self, wallet_type: Option<WalletType>) -> Result<ApiResponse, Error>`
+  - Get the full balance response as ApiResponse for the given wallet (`None` defaults to `WalletType::Local`).
 - `is_authenticated(&self) -> bool`
   - Returns authentication status.
 
@@ -131,6 +140,11 @@ let mut sdk = sdk.with_sender_id("MyCustomSender");
 - `MessagePriority::Medium` - Priority "2"
 - `MessagePriority::Low` - Priority "3"
 - `MessagePriority::Lowest` - Priority "4"
+
+#### WalletType
+
+- `WalletType::Local` - Local wallet (the API's default if omitted)
+- `WalletType::International` - International wallet
 
 #### ApiResponse
 
