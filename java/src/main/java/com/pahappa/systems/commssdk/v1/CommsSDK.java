@@ -381,17 +381,31 @@ public class CommsSDK {
     }
 
     /**
-     * Queries the balance and returns the full API response object.
+     * Queries the local wallet balance and returns the full API response object.
      *
      * @return ApiResponse object with balance and details, or null on error.
      */
     public ApiResponse queryBalance() {
+        return queryBalance(WalletType.LOCAL);
+    }
+
+    /**
+     * Queries the balance for the given wallet and returns the full API response object.
+     *
+     * @param walletType Which wallet to query. Defaults to {@link WalletType#LOCAL} if null.
+     * @return ApiResponse object with balance and details, or null on error.
+     */
+    public ApiResponse queryBalance(WalletType walletType) {
         if (sdkNotAuthenticated()) {
             return null;
+        }
+        if (walletType == null) {
+            walletType = WalletType.LOCAL;
         }
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setMethod("Balance");
         apiRequest.setUserdata(new UserData(userName, apiKey));
+        apiRequest.setWalletType(walletType);
         try {
             ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
             return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
@@ -401,12 +415,22 @@ public class CommsSDK {
     }
 
     /**
-     * Gets your current SMS account balance.
+     * Gets your current local wallet SMS account balance.
      *
      * @return Balance as a double.
      */
     public double getBalance() {
-        return queryBalance().getBalance();
+        return getBalance(WalletType.LOCAL);
+    }
+
+    /**
+     * Gets the SMS account balance for the given wallet.
+     *
+     * @param walletType Which wallet to query. Defaults to {@link WalletType#LOCAL} if null.
+     * @return Balance as a double.
+     */
+    public double getBalance(WalletType walletType) {
+        return queryBalance(walletType).getBalance();
     }
 
     /**

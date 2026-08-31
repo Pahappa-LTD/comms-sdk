@@ -13,4 +13,6 @@ public class ApiRequest {
     private UserData userdata;
     @JsonProperty(value = "msgdata")
     private List<MessageModel> messageData;
+    @JsonProperty(value = "walletType")
+    private WalletType walletType;
 }
