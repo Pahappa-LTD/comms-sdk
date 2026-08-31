@@ -216,6 +216,89 @@ public class CommsSDK {
     }
 
     /**
+     * Sends an SMS to a single number with default sender ID and priority, returning the full API response.
+     *
+     * @param number  Recipient phone number.
+     * @param message Message text.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(String number, String message) {
+        return querySendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGH);
+    }
+
+    /**
+     * Sends an SMS to a single number with custom sender ID, returning the full API response.
+     *
+     * @param number   Recipient phone number.
+     * @param message  Message text.
+     * @param senderId Sender ID.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(String number, String message, String senderId) {
+        return querySendSMS(Collections.singletonList(number), message, senderId, MessagePriority.HIGH);
+    }
+
+    /**
+     * Sends an SMS to a single number with custom sender ID and priority, returning the full API response.
+     *
+     * @param number   Recipient phone number.
+     * @param message  Message text.
+     * @param senderId Sender ID.
+     * @param priority Message priority.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(String number, String message, String senderId, MessagePriority priority) {
+        return querySendSMS(Collections.singletonList(number), message, senderId, priority);
+    }
+
+    /**
+     * Sends an SMS to a single number with default sender ID and custom priority, returning the full API response.
+     *
+     * @param number   Recipient phone number.
+     * @param message  Message text.
+     * @param priority Message priority.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(String number, String message, MessagePriority priority) {
+        return querySendSMS(Collections.singletonList(number), message, senderId, priority);
+    }
+
+    /**
+     * Sends an SMS to multiple numbers with default sender ID and priority, returning the full API response.
+     *
+     * @param numbers List of recipient phone numbers.
+     * @param message Message text.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(List<String> numbers, String message) {
+        return querySendSMS(numbers, message, senderId, MessagePriority.HIGH);
+    }
+
+    /**
+     * Sends an SMS to multiple numbers with custom sender ID, returning the full API response.
+     *
+     * @param numbers  List of recipient phone numbers.
+     * @param message  Message text.
+     * @param senderId Sender ID.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(List<String> numbers, String message, String senderId) {
+        return querySendSMS(numbers, message, senderId, MessagePriority.HIGH);
+    }
+
+    /**
+     * Sends an SMS to multiple numbers with default sender ID and custom priority, returning the full API response.
+     *
+     * @param numbers  List of recipient phone numbers.
+     * @param message  Message text.
+     * @param priority Message priority.
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse querySendSMS(List<String> numbers, String message, MessagePriority priority) {
+        return querySendSMS(numbers, message, senderId, priority);
+    }
+
+    /**
      * Sends an SMS and returns the full API response object.
      *
      * @param numbers  List of recipient phone numbers.
