@@ -5,7 +5,7 @@
 [![Packagist Downloads](https://img.shields.io/packagist/dt/pahappa-limited/comms-sdk?label=Packagist%20downloads)](https://packagist.org/packages/pahappa-limited/comms-sdk)
 [![Go Reference](https://pkg.go.dev/badge/github.com/Pahappa-LTD/comms-go-sdk.svg)](https://pkg.go.dev/github.com/Pahappa-LTD/comms-go-sdk)
 [![NuGet](https://img.shields.io/nuget/dt/CommsSdk?label=NuGet%20downloads)](https://www.nuget.org/packages/CommsSdk/)
-[![NPM Downloads](https://img.shields.io/npm/dm/comms-sdk?label=NPM%20downloads)](https://www.npmjs.com/package/comms-sdk)
+[![NPM Downloads](https://img.shields.io/npm/dm/@pahappalimited/comms-sdk?label=NPM%20downloads)](https://www.npmjs.com/package/@pahappalimited/comms-sdk)
 [![Maven Central](https://img.shields.io/maven-central/v/com.pahappa.systems/comms-sdk?label=Maven%20Central)](https://central.sonatype.com/artifact/com.pahappa.systems/comms-sdk)
 [![Pub.dev](https://img.shields.io/pub/v/comms_sdk?label=Pub.dev)](https://pub.dev/packages/comms_sdk)
 [![Crates.io](https://img.shields.io/crates/v/comms_sdk?label=Crates.io)](https://crates.io/crates/comms_sdk)

@@ -81,7 +81,6 @@ print(f"Balance: {balance}")
 response = sdk.query_balance()
 print(f"Status: {response.Status}")
 print(f"Balance: {response.Balance}")
-print(f"Currency: {response.Currency}")
 ```
 
 ### Configuration
@@ -148,8 +147,7 @@ sdk.with_sender_id("MyCustomSender")
 
 - `Status` - Response status ("OK" or "Failed")
 - `Message` - Response message
-- `Cost` - Message cost
-- `Currency` - Currency code
+- `Cost` - Message cost (not always a whole number)
 - `MsgFollowUpUniqueCode` - Unique tracking code
 - `Balance` - Account balance
 
