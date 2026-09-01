@@ -67,7 +67,6 @@ Console.WriteLine($"Balance: {balance}");
 var balanceResponse = await sdk.QueryBalance();
 Console.WriteLine($"Status: {balanceResponse?.Status}");
 Console.WriteLine($"Balance: {balanceResponse?.Balance}");
-Console.WriteLine($"Currency: {balanceResponse?.Currency}");
 ```
 
 ### Configuration
@@ -149,8 +148,7 @@ sdk = sdk.WithSenderId("MyCustomSender");
 
 - `Status` - Response status ("OK" or "Failed")
 - `Message` - Response message
-- `Cost` - Message cost
-- `Currency` - Currency code
+- `Cost` - Message cost (not always a whole number)
 - `MsgFollowUpUniqueCode` - Unique tracking code
 - `Balance` - Account balance
 

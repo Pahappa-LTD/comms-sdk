@@ -11,10 +11,7 @@ public class ApiResponse
     public string? Message { get; set; }
 
     [JsonPropertyName("Cost")]
-    public int? Cost { get; set; }
-
-    [JsonPropertyName("Currency")]
-    public string? Currency { get; set; }
+    public double? Cost { get; set; }
 
     [JsonPropertyName("MsgFollowUpUniqueCode")]
     public string? MessageFollowUpCode { get; set; }
