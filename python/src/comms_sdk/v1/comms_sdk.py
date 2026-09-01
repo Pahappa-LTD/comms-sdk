@@ -53,10 +53,7 @@ class CommsSDK:
         self._sender_id = sender_id
         return self
 
-    def send_sms(self, numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGHEST) -> bool:
-        if isinstance(numbers, str):
-            numbers = [numbers]
-
+    def send_sms(self, numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGH) -> bool:
         api_response = self.query_send_sms(numbers, message, sender_id or self._sender_id, priority)
 
         if api_response is None:
@@ -73,9 +70,13 @@ class CommsSDK:
         else:
             raise RuntimeError(f"Unexpected response status: {api_response.Status}")
 
-    def query_send_sms(self, numbers: List[str], message: str, sender_id: str, priority: MessagePriority) -> Optional[ApiResponse]:
+    def query_send_sms(self, numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGH) -> Optional[ApiResponse]:
         if self._sdk_not_authenticated():
             return None
+
+        if isinstance(numbers, str):
+            numbers = [numbers]
+        sender_id = sender_id or self._sender_id
 
         if not numbers:
             raise ValueError("Numbers list cannot be empty")

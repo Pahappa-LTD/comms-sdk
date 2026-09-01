@@ -2,7 +2,7 @@
 
 A Python implementation of the CommsSDK for sending SMS and managing communications, following the same patterns as the Ruby and Kotlin reference implementations.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 
 ---
 
@@ -116,10 +116,10 @@ sdk.with_sender_id("MyCustomSender")
 
 - `with_sender_id(sender_id: str) -> CommsSDK`
   - Set sender ID, returns self for chaining.
-- `send_sms(numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGHEST) -> bool`
+- `send_sms(numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGH) -> bool`
   - Send SMS, returns boolean.
-- `query_send_sms(numbers: List[str], message: str, sender_id: str, priority: MessagePriority) -> Optional[ApiResponse]`
-  - Send SMS, returns full ApiResponse.
+- `query_send_sms(numbers: str | List[str], message: str, sender_id: Optional[str] = None, priority: MessagePriority = MessagePriority.HIGH) -> Optional[ApiResponse]`
+  - Same as `send_sms`, but returns the full ApiResponse.
 - `get_balance() -> Optional[float]`
   - Get account balance as float.
 - `query_balance() -> Optional[ApiResponse]`
