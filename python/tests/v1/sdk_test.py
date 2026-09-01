@@ -229,12 +229,22 @@ class TestCommsSDK(unittest.TestCase):
 
 class TestLiveSandbox(unittest.TestCase):
     """
-    One golden-path smoke test that hits the real sandbox API, guarding against
+    Golden-path smoke tests that hit the real sandbox API (never production -
+    CommsSDK.use_sandbox() is always called explicitly first), guarding against
     regressions that only show up against the live server (e.g. the walletType
     bug fixed earlier this session, which mocked tests alone would not catch).
-    Skipped entirely unless COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY are set
-    in the environment - no credentials are hardcoded here.
+
+    All but the wrong-credentials case are skipped entirely unless
+    COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY are set in the environment -
+    no real credentials are hardcoded here.
     """
+
+    def test_wrong_credentials_rejected(self):
+        # Always runs (costs nothing) - never a real, leaked, or placeholder
+        # credential, just an obviously-fake one.
+        CommsSDK.use_sandbox()
+        sdk = CommsSDK.authenticate("invalid-user", "invalid-key-00000000000000000000000000000000")
+        self.assertFalse(sdk.is_authenticated)
 
     @unittest.skipUnless(
         os.environ.get("COMMS_SANDBOX_USERNAME") and os.environ.get("COMMS_SANDBOX_API_KEY"),
@@ -249,6 +259,65 @@ class TestLiveSandbox(unittest.TestCase):
         self.assertTrue(sdk.is_authenticated)
 
         response = sdk.query_send_sms(["256700000000"], "Test message from Python SDK live suite")
+        self.assertIsNotNone(response)
+        self.assertEqual(response.Status, "OK")
+
+    @unittest.skipUnless(
+        os.environ.get("COMMS_SANDBOX_USERNAME") and os.environ.get("COMMS_SANDBOX_API_KEY"),
+        "COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY not set; skipping live sandbox test",
+    )
+    def test_send_sms_to_multiple_numbers_against_sandbox(self):
+        CommsSDK.use_sandbox()
+        sdk = CommsSDK.authenticate(
+            os.environ["COMMS_SANDBOX_USERNAME"],
+            os.environ["COMMS_SANDBOX_API_KEY"],
+        )
+        self.assertTrue(sdk.is_authenticated)
+
+        response = sdk.query_send_sms(
+            ["256700000000", "256700000001", "256700000002"],
+            "Test multi-number message from Python SDK live suite",
+        )
+        self.assertIsNotNone(response)
+        self.assertEqual(response.Status, "OK")
+
+    @unittest.skipUnless(
+        os.environ.get("COMMS_SANDBOX_USERNAME") and os.environ.get("COMMS_SANDBOX_API_KEY"),
+        "COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY not set; skipping live sandbox test",
+    )
+    def test_send_sms_rejects_more_than_1000_numbers(self):
+        # The real API already rejects oversized recipient lists server-side;
+        # this proves the SDK surfaces that cleanly (no crash, no batching)
+        # rather than that the SDK enforces the limit itself.
+        CommsSDK.use_sandbox()
+        sdk = CommsSDK.authenticate(
+            os.environ["COMMS_SANDBOX_USERNAME"],
+            os.environ["COMMS_SANDBOX_API_KEY"],
+        )
+        self.assertTrue(sdk.is_authenticated)
+
+        numbers = [f"256700{i:06d}" for i in range(1001)]
+        response = sdk.query_send_sms(numbers, "This should be rejected for having too many recipients")
+        self.assertIsNotNone(response)
+        self.assertNotEqual(response.Status, "OK")
+
+    @unittest.skipUnless(
+        os.environ.get("COMMS_SANDBOX_USERNAME") and os.environ.get("COMMS_SANDBOX_API_KEY"),
+        "COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY not set; skipping live sandbox test",
+    )
+    def test_balance_methods_against_sandbox(self):
+        CommsSDK.use_sandbox()
+        sdk = CommsSDK.authenticate(
+            os.environ["COMMS_SANDBOX_USERNAME"],
+            os.environ["COMMS_SANDBOX_API_KEY"],
+        )
+        self.assertTrue(sdk.is_authenticated)
+
+        balance = sdk.get_balance()
+        self.assertIsNotNone(balance)
+        self.assertGreaterEqual(balance, 0)
+
+        response = sdk.query_balance()
         self.assertIsNotNone(response)
         self.assertEqual(response.Status, "OK")
 
