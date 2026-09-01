@@ -43,6 +43,12 @@ namespace Comms
             ApiUrl = "https://comms.egosms.co/api/v1/json";
         }
 
+        /// <summary>Points the SDK at a custom API endpoint. Intended for tests that stand up a local mock server.</summary>
+        public static void UseCustomServer(string url)
+        {
+            ApiUrl = url;
+        }
+
         public void SetAuthenticated()
         {
             IsAuthenticated = true;
