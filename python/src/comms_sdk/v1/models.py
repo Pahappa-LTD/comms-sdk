@@ -69,7 +69,6 @@ class ApiRequest(JSONSerializable):
 class ApiResponse(JSONSerializable):
     Status: str
     Message: Optional[str] = None
-    Cost: Optional[int] = None
-    Currency: Optional[str] = None
+    Cost: Optional[float] = None
     MsgFollowUpUniqueCode: Optional[str] = None
     Balance: Optional[str] = None
