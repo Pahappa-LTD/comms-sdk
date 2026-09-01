@@ -83,9 +83,7 @@ pub struct ApiResponse {
     #[serde(rename = "Message")]
     pub message: Option<String>,
     #[serde(rename = "Cost")]
-    pub cost: Option<i32>,
-    #[serde(rename = "Currency")]
-    pub currency: Option<String>,
+    pub cost: Option<f64>,
     #[serde(rename = "MsgFollowUpUniqueCode")]
     pub message_follow_up_code: Option<String>,
     #[serde(rename = "Balance")]

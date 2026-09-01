@@ -150,8 +150,7 @@ let mut sdk = sdk.with_sender_id("MyCustomSender");
 
 - `status` - Response status (`ApiResponseCode::OK` or `ApiResponseCode::Failed`)
 - `message` - Response message
-- `cost` - Message cost
-- `currency` - Currency code
+- `cost` - Message cost (not always a whole number)
 - `message_follow_up_code` - Unique tracking code
 - `balance` - Account balance
 
