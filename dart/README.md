@@ -2,7 +2,7 @@
 
 A Dart implementation of the CommsSDK for sending SMS and managing communications, following the same patterns as the Python, Ruby, and Kotlin reference implementations.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 
 ---
 
@@ -23,12 +23,12 @@ Add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  comms_sdk: ^1.0.1
+  comms_sdk: ^1.1.0
 ```
 
 Then run:
 
-```sh
+```powershell
 dart pub get
 ```
 
@@ -52,7 +52,7 @@ void main() async {
 ```dart
 // Send SMS to a single number
 final success = await sdk.sendSMS(
-  numbers: ['256712345678'],
+  numbers: '256712345678',
   message: 'Hello from Dart!',
 );
 
@@ -119,10 +119,10 @@ sdk.withSenderId('MyCustomSender');
 
 - `CommsSDK withSenderId(String senderId)`
   - Set sender ID, returns self for chaining.
-- `Future<bool> sendSMS({required List<String> numbers, required String message, String? senderId, MessagePriority? priority})`
-  - Send SMS, returns boolean.
-- `Future<ApiResponse?> querySendSMS({required List<String> numbers, required String message, String? senderId, MessagePriority? priority})`
-  - Send SMS, returns full ApiResponse.
+- `Future<bool> sendSMS({required Object numbers, required String message, String? senderId, MessagePriority? priority})`
+  - `numbers` accepts a single `String` or a `List<String>`. Send SMS, returns boolean.
+- `Future<ApiResponse?> querySendSMS({required Object numbers, required String message, String? senderId, MessagePriority? priority})`
+  - Same as `sendSMS`, but returns the full ApiResponse.
 - `Future<double?> getBalance()`
   - Get account balance as double.
 - `Future<ApiResponse?> queryBalance()`

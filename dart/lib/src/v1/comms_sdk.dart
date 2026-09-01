@@ -18,7 +18,7 @@ class CommsSDK {
   String? apiKey;
 
   String senderId = 'EgoSMS';
-  bool isAuthenticated = false;
+  bool _isAuthenticated = false;
   final http.Client _client = http.Client();
 
   CommsSDK._();
@@ -43,7 +43,7 @@ class CommsSDK {
   }
 
   void setAuthenticated() {
-    isAuthenticated = true;
+    _isAuthenticated = true;
   }
 
   CommsSDK withSenderId(String senderId) {
@@ -52,7 +52,7 @@ class CommsSDK {
   }
 
   Future<bool> sendSMS({
-    required List<String> numbers,
+    required Object numbers,
     required String message,
     String? senderId,
     MessagePriority? priority,
@@ -60,8 +60,8 @@ class CommsSDK {
     final apiResponse = await querySendSMS(
       numbers: numbers,
       message: message,
-      senderId: senderId ?? this.senderId,
-      priority: priority ?? MessagePriority.HIGHEST,
+      senderId: senderId,
+      priority: priority,
     );
 
     if (apiResponse == null) {
@@ -83,13 +83,23 @@ class CommsSDK {
 
   /// Same as [sendSMS] but returns the full [ApiResponse] object.
   Future<ApiResponse?> querySendSMS({
-    required List<String> numbers,
+    required Object numbers,
     required String message,
-    required String senderId,
-    required MessagePriority priority,
+    String? senderId,
+    MessagePriority? priority,
   }) async {
     if (await _sdkNotAuthenticated()) return null;
-    if (numbers.isEmpty) {
+
+    List<String> numbersList;
+    if (numbers is String) {
+      numbersList = [numbers];
+    } else if (numbers is List<String>) {
+      numbersList = numbers;
+    } else {
+      throw ArgumentError('numbers must be a String or List<String>');
+    }
+
+    if (numbersList.isEmpty) {
       throw ArgumentError('Numbers list cannot be empty');
     }
     if (message.isEmpty) {
@@ -98,6 +108,8 @@ class CommsSDK {
     if (message.length == 1) {
       throw ArgumentError('Message cannot be a single character');
     }
+    senderId ??= this.senderId;
+    priority ??= MessagePriority.HIGH;
     if (senderId.trim().isEmpty) {
       senderId = this.senderId;
     }
@@ -105,19 +117,21 @@ class CommsSDK {
       print('Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.');
     }
 
-    numbers = NumberValidator.validateNumbers(numbers);
-    if (numbers.isEmpty) {
+    final validatedNumbers = NumberValidator.validateNumbers(numbersList);
+    if (validatedNumbers.isEmpty) {
       print('No valid phone numbers provided. Please check inputs.');
       return null;
     }
 
-    final messageModels = numbers
+    final resolvedSenderId = senderId;
+    final resolvedPriority = priority;
+    final messageModels = validatedNumbers
         .map(
           (number) => MessageModel(
             number: number,
             message: message,
-            senderId: senderId,
-            priority: priority,
+            senderId: resolvedSenderId,
+            priority: resolvedPriority,
           ),
         )
         .toList();
@@ -143,7 +157,7 @@ class CommsSDK {
   }
 
   Future<bool> _sdkNotAuthenticated() async {
-    if (!isAuthenticated) {
+    if (!_isAuthenticated) {
       print(
         'SDK is not authenticated. Please authenticate before performing actions.',
       );
