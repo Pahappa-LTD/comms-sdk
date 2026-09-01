@@ -1,0 +1,14 @@
+# Rename this file to gradle.properties and fill in the values
+
+# gpr = github
+gpr.user=
+gpr.key=
+
+# maven central credentials for publishing
+mavenCentral.username=
+mavenCentral.password=
+
+# gpg signing
+signing.gnupg.executable=gpg
+signing.gnupg.keyName=YOUR_KEY_ID
+signing.gnupg.passphrase=YOUR_PASSPHRASE

@@ -18,17 +18,10 @@ object Validator {
             throw (IllegalArgumentException("API Key and Username must be provided"));
         }
         if (!isValidCredential(sdk)) {
-            println(
-                "                                                      _                    \n" +
-                        "  /\\     _|_ |_   _  ._ _|_ o  _  _. _|_ o  _  ._    |_ _. o |  _   _| | | \n" +
-                        " /--\\ |_| |_ | | (/_ | | |_ | (_ (_|  |_ | (_) | |   | (_| | | (/_ (_| o o \n" +
-                        "                                                                           \n" +
-                        "\n"
-            );
+            println("Authentication Failed");
             return false;
         }
         println("Validated using basic auth");
-        sdk.setAuthenticated();
         return true;
     }
 
@@ -63,7 +56,7 @@ object Validator {
                 null -> return false
             }
         } catch (e: Error) {
-            System.err.println("Error validating credentials: " + e.message)
+            println("Error validating credentials: " + e.message)
             return false
         }
     }

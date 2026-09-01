@@ -15,7 +15,7 @@ object NumberValidator {
      */
     fun validateNumbers(numbers: List<String>): List<String> {
         if (numbers.isEmpty()) {
-            System.err.println("Number list cannot be empty")
+            println("Number list cannot be empty")
             return ArrayList()
         }
 
@@ -23,7 +23,7 @@ object NumberValidator {
         for (number in numbers) {
             var number = number
             if (number.trim { it <= ' ' }.isEmpty()) {
-                System.out.printf("Number (%s) cannot be empty!\n", number)
+                printf("Number (%s) cannot be empty!\n", number)
                 continue
             }
             number = number.trim { it <= ' ' }.replace("-|\\s".toRegex(), "")
@@ -35,7 +35,7 @@ object NumberValidator {
                 }
                 cleansed.add(number)
             } else {
-                System.out.printf("Number (%s) is not valid!\n", number)
+                printf("Number (%s) is not valid!\n", number)
             }
         }
         return ArrayList(cleansed)
