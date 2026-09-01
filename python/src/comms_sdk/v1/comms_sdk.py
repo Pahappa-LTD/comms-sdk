@@ -43,11 +43,11 @@ class CommsSDK:
 
     @staticmethod
     def use_sandbox():
-        CommsSDK.API_URL = "https://comms-test.pahappa.net/api/v1/json"
+        CommsSDK.API_URL = "https://comms-test.pahappa.net/api/v1/json/"
 
     @staticmethod
     def use_live_server():
-        CommsSDK.API_URL = "https://comms.egosms.co/api/v1/json"
+        CommsSDK.API_URL = "https://comms.egosms.co/api/v1/json/"
 
     def with_sender_id(self, sender_id: str):
         self._sender_id = sender_id

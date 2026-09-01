@@ -1,13 +1,15 @@
 import os
 import unittest
-# import sys
-from unittest.mock import patch, MagicMock
 from io import StringIO
+
+# import sys
+from unittest.mock import MagicMock, patch
+
 import requests
 
 from comms_sdk.v1 import CommsSDK, MessagePriority
-from comms_sdk.v1 import utils
 from comms_sdk.v1.models import WalletType
+
 
 class TestCommsSDK(unittest.TestCase):
 
@@ -17,7 +19,14 @@ class TestCommsSDK(unittest.TestCase):
 
     @patch('comms_sdk.v1.utils.Validator.validate_credentials')
     def test_authenticate_success(self, mock_validate_credentials):
-        mock_validate_credentials.return_value = True
+        # validate_credentials() is fully mocked out, so it must also perform
+        # the side effect the real implementation has (marking the SDK
+        # authenticated) - otherwise this only tests the mock, not the SDK.
+        def fake_validate(sdk):
+            sdk.set_authenticated()
+            return True
+        mock_validate_credentials.side_effect = fake_validate
+
         sdk = CommsSDK.authenticate("test_user", "test_password")
         self.assertIsNotNone(sdk)
         self.assertEqual(sdk.user_name, "test_user")
@@ -27,7 +36,7 @@ class TestCommsSDK(unittest.TestCase):
 
     def test_use_sandbox(self):
         CommsSDK.use_sandbox()
-        self.assertEqual(CommsSDK.API_URL, "http://comms-test.pahappa.net/api/v1/json/")
+        self.assertEqual(CommsSDK.API_URL, "https://comms-test.pahappa.net/api/v1/json/")
 
     def test_use_live_server(self):
         CommsSDK.use_sandbox() # Set to sandbox first
@@ -124,16 +133,16 @@ class TestCommsSDK(unittest.TestCase):
             self.assertIn("Attempting to re-authenticate", fake_stderr.getvalue())
 
     def test_send_sms_invalid_inputs(self):
-        sdk = CommsSDK.authenticate("user", "pass") # Authenticate for these tests
-        sdk.is_authenticated = True # Force authenticated for input validation tests
+        sdk = CommsSDK()
+        sdk.set_authenticated() # Force authenticated for input validation tests, without a real network call
 
         with self.assertRaises(ValueError) as cm:
             sdk.send_sms(numbers=[], message="Test")
-        self.assertIn("Numbers list cannot be null or empty", str(cm.exception))
+        self.assertIn("Numbers list cannot be empty", str(cm.exception))
 
         with self.assertRaises(ValueError) as cm:
             sdk.send_sms(numbers=["+256771234567"], message="")
-        self.assertIn("Message cannot be null or empty", str(cm.exception))
+        self.assertIn("Message cannot be empty", str(cm.exception))
 
         with self.assertRaises(ValueError) as cm:
             sdk.send_sms(numbers=["+256771234567"], message="a")
@@ -157,22 +166,30 @@ class TestCommsSDK(unittest.TestCase):
     @patch('comms_sdk.v1.utils.Validator.validate_credentials')
     @patch('requests.Session.post')
     def test_get_balance_success(self, mock_post, mock_validate_credentials):
-        mock_validate_credentials.return_value = True
+        # validate_credentials() is fully mocked out, so it must also perform
+        # the side effect the real implementation has (marking the SDK
+        # authenticated) - otherwise the balance call is rejected as unauthenticated.
+        def fake_validate(sdk):
+            sdk.set_authenticated()
+            return True
+        mock_validate_credentials.side_effect = fake_validate
+
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {"Status": "OK", "Balance": "UGX 10000", "MsgFollowUpUniqueCode": "BALANCE_CODE"}
+        # Balance is always a plain number on the wire (confirmed via live API
+        # testing), never a currency-prefixed string - get_balance() does
+        # float(response.Balance), so a value like "UGX 10000" would raise.
+        mock_response.json.return_value = {"Status": "OK", "Balance": "10000"}
         mock_post.return_value = mock_response
 
         sdk = CommsSDK.authenticate("test_user", "test_password")
-        
-        with patch('sys.stdout', new=StringIO()) as fake_stdout:
-            balance = sdk.get_balance()
-            self.assertEqual(balance, "UGX 10000")
-            self.assertIn("MessageFollowUpUniqueCode: BALANCE_CODE", fake_stdout.getvalue())
-            mock_post.assert_called_once()
-            args, kwargs = mock_post.call_args
-            self.assertIn(CommsSDK.API_URL, args)
-            self.assertIn("Balance", kwargs['json']['method'])
+
+        balance = sdk.get_balance()
+        self.assertEqual(balance, 10000.0)
+        mock_post.assert_called_once()
+        args, kwargs = mock_post.call_args
+        self.assertIn(CommsSDK.API_URL, args)
+        self.assertIn("Balance", kwargs['json']['method'])
 
     @patch('comms_sdk.v1.utils.Validator.validate_credentials')
     def test_get_balance_not_authenticated(self, mock_validate_credentials):

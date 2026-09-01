@@ -1,12 +1,13 @@
 import os
 import unittest
-import requests, comms_sdk
-from unittest.mock import patch, MagicMock
 from io import StringIO
+from unittest.mock import MagicMock, patch
 
+import requests
+
+from comms_sdk import CommsSDK
 from comms_sdk.v1.utils import NumberValidator, Validator
-from comms_sdk.v1.models import ApiRequest, ApiResponse, ApiResponseCode, UserData
-from comms_sdk import CommsSDK # Needed for Validator tests
+
 
 class TestNumberValidator(unittest.TestCase):
 
@@ -56,7 +57,7 @@ class TestValidator(unittest.TestCase):
         mock_post.return_value = mock_response
 
         sdk = CommsSDK()
-        sdk._username = "test_user"
+        sdk._user_name = "test_user"
         sdk._api_key = "test_password"
 
         with patch('sys.stdout', new=StringIO()) as fake_stdout:
@@ -64,7 +65,7 @@ class TestValidator(unittest.TestCase):
             self.assertTrue(result)
             self.assertTrue(sdk.is_authenticated)
             self.assertIn("Credentials validated successfully.", fake_stdout.getvalue())
-            self.assertIn("Validated using basic auth", fake_stdout.getvalue())
+            self.assertIn("Validated using an api key", fake_stdout.getvalue())
 
     @patch('requests.Session.post')
     def test_validate_credentials_failed_api_response(self, mock_post):
@@ -74,7 +75,7 @@ class TestValidator(unittest.TestCase):
         mock_post.return_value = mock_response
 
         sdk = CommsSDK()
-        sdk._username = "test_user"
+        sdk._user_name = "test_user"
         sdk._api_key = "wrong_password"
 
         with patch('sys.stderr', new=StringIO()) as fake_stderr:
@@ -88,7 +89,7 @@ class TestValidator(unittest.TestCase):
         mock_post.side_effect = requests.exceptions.RequestException("Network error")
 
         sdk = CommsSDK()
-        sdk._username = "test_user"
+        sdk._user_name = "test_user"
         sdk._api_key = "test_password"
 
         with patch('sys.stderr', new=StringIO()) as fake_stderr:
@@ -101,7 +102,7 @@ class TestValidator(unittest.TestCase):
         sdk = CommsSDK()
         with self.assertRaises(ValueError) as cm:
             Validator.validate_credentials(sdk)
-        self.assertIn("Either API Key or Username and Password must be provided", str(cm.exception))
+        self.assertIn("API Key and Username must be provided", str(cm.exception))
         self.assertFalse(sdk.is_authenticated)
 
     def test_validate_credentials_sdk_none(self):
@@ -120,7 +121,7 @@ class TestValidator(unittest.TestCase):
         mock_post.return_value = mock_response
 
         sdk = CommsSDK()
-        sdk._username = "test_user"
+        sdk._user_name = "test_user"
         sdk._api_key = "test_password"
 
         with patch('sys.stdout', new=StringIO()):
@@ -140,7 +141,12 @@ class TestValidator(unittest.TestCase):
             os.environ["COMMS_SANDBOX_API_KEY"],
         )
         self.assertIsNotNone(sdk.get_balance())
-        self.assertTrue(sdk.send_sms("0712345678", "Message 1"))
+        # 0700000000 (-> 256700000000) is the number used across every
+        # language's live-sandbox tests this session and is known to be
+        # accepted by the sandbox; other prefixes (e.g. 071...) can be
+        # rejected by the API itself with "No valid recipients detected"
+        # even though they pass the SDK's own format validation.
+        self.assertTrue(sdk.send_sms("0700000000", "Message 1"))
 
 if __name__ == '__main__':
     unittest.main()

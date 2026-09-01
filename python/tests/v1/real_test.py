@@ -13,12 +13,19 @@ Run this file directly (`python tests/v1/real_test.py`) for an ad-hoc manual
 check against the sandbox.
 """
 
+import sys
+from os import environ
+
 from comms_sdk import CommsSDK
 
 if __name__ == "__main__":
-    username = "sandbox"
-    apikey = "sandbox35"
+    username = environ.get("COMMS_SANDBOX_USERNAME")
+    apikey = environ.get("COMMS_SANDBOX_API_KEY")
+    if username is None or apikey is None:
+        print("The credentials (COMMS_SANDBOX_USERNAME, COMMS_SANDBOX_API_KEY) were not loaded from the environment. skipping the python tests...")
+        sys.exit()
+    CommsSDK.use_sandbox()
     sdk = CommsSDK.authenticate(username, apikey)
     bal = sdk.get_balance()
     print(bal)
-    sdk.send_sms(["0752345678", "0752345679"], "Message 1")
+    _ = sdk.send_sms(["0752345678", "0752345679"], "Message 1")
