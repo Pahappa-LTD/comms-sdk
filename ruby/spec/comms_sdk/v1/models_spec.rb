@@ -57,6 +57,28 @@ RSpec.describe 'CommsSdk::V1 Models' do
     end
   end
 
+  describe CommsSdk::V1::WalletType do
+    describe 'constants' do
+      it 'has correct values for both wallet types' do
+        expect(CommsSdk::V1::WalletType::LOCAL.value).to eq("Local")
+        expect(CommsSdk::V1::WalletType::INTERNATIONAL.value).to eq("International")
+      end
+    end
+
+    describe '.from_value' do
+      it 'returns correct wallet type for each value' do
+        expect(described_class.from_value("Local")).to eq(CommsSdk::V1::WalletType::LOCAL)
+        expect(described_class.from_value("International")).to eq(CommsSdk::V1::WalletType::INTERNATIONAL)
+      end
+
+      it 'raises error for unknown value' do
+        expect {
+          described_class.from_value("Foreign")
+        }.to raise_error(ArgumentError, /Unknown wallet type value: Foreign/)
+      end
+    end
+  end
+
   describe CommsSdk::V1::UserData do
     let(:username) { "agabu-idaniel" }
     let(:apikey) { "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99" }
@@ -203,6 +225,22 @@ RSpec.describe 'CommsSdk::V1 Models' do
           expect(hash["method"]).to eq("SendSms")
           expect(hash["userdata"]).to eq(user_data.to_hash)
           expect(hash["msgdata"]).to eq([message_model.to_hash])
+        end
+      end
+
+      context 'with wallet type' do
+        let(:api_request) do
+          described_class.new(
+            method: "Balance",
+            userdata: user_data,
+            wallet_type: CommsSdk::V1::WalletType::LOCAL
+          )
+        end
+
+        it 'returns hash with walletType' do
+          hash = api_request.to_hash
+
+          expect(hash["walletType"]).to eq("Local")
         end
       end
     end

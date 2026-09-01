@@ -97,7 +97,8 @@ module CommsSdk
         api_request = ApiRequest.new(
           method: "SendSms",
           userdata: UserData.new(@user_name, @api_key),
-          msgdata: message_models
+          msgdata: message_models,
+          wallet_type: WalletType::LOCAL
         )
         
         begin
@@ -114,14 +115,17 @@ module CommsSdk
         end
       end
 
-      def query_balance
+      def query_balance(wallet_type: nil)
         return nil if sdk_not_authenticated?
-        
+
+        wallet_type ||= WalletType::LOCAL
+
         api_request = ApiRequest.new(
           method: "Balance",
-          userdata: UserData.new(@user_name, @api_key)
+          userdata: UserData.new(@user_name, @api_key),
+          wallet_type: wallet_type
         )
-        
+
         begin
           response = make_http_request(api_request)
           ApiResponse.from_hash(JSON.parse(response.body))
@@ -130,8 +134,8 @@ module CommsSdk
         end
       end
 
-      def get_balance
-        response = query_balance
+      def get_balance(wallet_type: nil)
+        response = query_balance(wallet_type: wallet_type)
         return nil if response.nil? || response.balance.nil?
         
         begin

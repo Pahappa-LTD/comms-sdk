@@ -63,7 +63,8 @@ module CommsSdk
         def self.valid_credential?(sdk)
           api_request = ApiRequest.new(
             method: "Balance",
-            userdata: UserData.new(sdk.user_name, sdk.api_key)
+            userdata: UserData.new(sdk.user_name, sdk.api_key),
+            wallet_type: WalletType::LOCAL
           )
 
           begin

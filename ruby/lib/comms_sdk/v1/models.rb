@@ -51,6 +51,28 @@ module CommsSdk
       LOWEST = new("4")
     end
 
+    class WalletType
+      attr_reader :value
+
+      def initialize(value)
+        @value = value
+      end
+
+      def self.from_value(text)
+        case text
+        when "Local"
+          LOCAL
+        when "International"
+          INTERNATIONAL
+        else
+          raise ArgumentError, "Unknown wallet type value: #{text}"
+        end
+      end
+
+      LOCAL = new("Local")
+      INTERNATIONAL = new("International")
+    end
+
     class UserData
       attr_reader :username, :apikey
 
@@ -96,12 +118,13 @@ module CommsSdk
     end
 
     class ApiRequest
-      attr_reader :method, :userdata, :msgdata
+      attr_reader :method, :userdata, :msgdata, :wallet_type
 
-      def initialize(method:, userdata:, msgdata: nil)
+      def initialize(method:, userdata:, msgdata: nil, wallet_type: nil)
         @method = method
         @userdata = userdata
         @msgdata = msgdata
+        @wallet_type = wallet_type
       end
 
       def to_hash
@@ -110,6 +133,7 @@ module CommsSdk
           "userdata" => @userdata.to_hash
         }
         hash["msgdata"] = @msgdata.map(&:to_hash) if @msgdata
+        hash["walletType"] = @wallet_type.value if @wallet_type
         hash
       end
 
