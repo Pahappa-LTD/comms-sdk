@@ -345,6 +345,7 @@ public class CommsSDK {
         }
         apiRequest.setMessageData(messageModels);
         apiRequest.setUserdata(new UserData(userName, apiKey));
+        apiRequest.setWalletType(WalletType.LOCAL);
         ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
         try {
             return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);

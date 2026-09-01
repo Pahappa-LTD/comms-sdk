@@ -4,6 +4,7 @@ import com.pahappa.systems.commssdk.v1.CommsSDK;
 import com.pahappa.systems.commssdk.v1.models.ApiRequest;
 import com.pahappa.systems.commssdk.v1.models.ApiResponse;
 import com.pahappa.systems.commssdk.v1.models.UserData;
+import com.pahappa.systems.commssdk.v1.models.WalletType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -36,6 +37,7 @@ public final class Validator {
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setMethod("Balance");
         apiRequest.setUserdata(new UserData(sdk.getUserName(), sdk.getApiKey()));
+        apiRequest.setWalletType(WalletType.LOCAL);
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON); // force JSON because some edge cases had the media type being sent as XML
