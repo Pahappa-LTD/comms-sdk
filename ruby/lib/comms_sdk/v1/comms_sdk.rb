@@ -9,7 +9,7 @@ require_relative 'utils'
 module CommsSdk
   module V1
     class CommsSDK
-      API_URL = "https://comms-test.pahappa.net/api/v1/json/"
+      API_URL = "https://comms.egosms.co/api/v1/json/"
 
       attr_reader :api_key, :user_name, :sender_id, :is_authenticated
 
@@ -35,7 +35,7 @@ module CommsSdk
 
       def self.use_live_server
         remove_const(:API_URL) if const_defined?(:API_URL)
-        const_set(:API_URL, "https://comms-test.pahappa.net/api/v1/json")
+        const_set(:API_URL, "https://comms.egosms.co/api/v1/json")
       end
 
       def set_authenticated
@@ -47,10 +47,8 @@ module CommsSdk
         self
       end
 
-      def send_sms(numbers, message, sender_id: nil, priority: MessagePriority::HIGHEST)
-        numbers = [numbers] if numbers.is_a?(String)
-        
-        api_response = query_send_sms(numbers, message, sender_id || @sender_id, priority)
+      def send_sms(numbers, message, sender_id: nil, priority: MessagePriority::HIGH)
+        api_response = query_send_sms(numbers, message, sender_id: sender_id, priority: priority)
         
         if api_response.nil?
           puts "Failed to get a response from the server."
@@ -70,9 +68,12 @@ module CommsSdk
         end
       end
 
-      def query_send_sms(numbers, message, sender_id, priority)
+      def query_send_sms(numbers, message, sender_id: nil, priority: MessagePriority::HIGH)
         return nil if sdk_not_authenticated?
-        
+
+        numbers = [numbers] if numbers.is_a?(String)
+        sender_id ||= @sender_id
+
         raise ArgumentError, "Numbers list cannot be empty" if numbers.nil? || numbers.empty?
         raise ArgumentError, "Message cannot be empty" if message.nil? || message.empty?
         raise ArgumentError, "Message cannot be a single character" if message.length == 1

@@ -2,7 +2,7 @@
 
 A Ruby implementation of the CommsSDK for sending SMS and managing communications, following the same patterns as the Python and Kotlin reference implementations.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 
 ---
 
@@ -22,7 +22,7 @@ A Ruby implementation of the CommsSDK for sending SMS and managing communication
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'comms_sdk', '~> 1.0.1'
+gem 'comms_sdk', '~> 1.1.0'
 ```
 
 And then execute:
@@ -122,10 +122,10 @@ sdk.with_sender_id("MyCustomSender")
 
 - `with_sender_id(sender_id)`
   Set sender ID, returns self for chaining.
-- `send_sms(numbers, message, sender_id: nil, priority: MessagePriority::HIGHEST)`
+- `send_sms(numbers, message, sender_id: nil, priority: MessagePriority::HIGH)`
   Send SMS, returns boolean.
-- `query_send_sms(numbers, message, sender_id, priority)`
-  Send SMS, returns full ApiResponse.
+- `query_send_sms(numbers, message, sender_id: nil, priority: MessagePriority::HIGH)`
+  Same as `send_sms`, but returns the full ApiResponse.
 - `get_balance`
   Get account balance as float.
 - `query_balance`
