@@ -2,7 +2,7 @@
 
 A modern, type-safe SDK for sending SMS and querying balances via the EgoSMS Comms API, written in Kotlin.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 **Package:** `comms-sdk`
 
 ---
@@ -13,7 +13,7 @@ Add the SDK to your project using Gradle:
 
 ```kotlin
 dependencies {
-    implementation("com.pahappa.systems:comms-sdk:1.0.1")
+    implementation("com.pahappa.systems:comms-sdk:1.1.0")
 }
 ```
 
@@ -23,7 +23,7 @@ Or with Maven:
 <dependency>
     <groupId>com.pahappa.systems</groupId>
     <artifactId>comms-sdk</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -101,20 +101,21 @@ fun main() {
 - `withSenderId(senderId: String): CommsSDK`
   Set the sender ID for outgoing messages.
 
-- `sendSMS(number: String, message: String, senderId: String = this.senderId, priority: MessagePriority = MessagePriority.HIGHEST): Boolean`
+- `sendSMS(number: String, message: String, senderId: String = this.senderId, priority: MessagePriority = MessagePriority.HIGH): Boolean`
   Send an SMS to a single number.
 
-- `sendSMS(numbers: List<String>, message: String, senderId: String = this.senderId, priority: MessagePriority = MessagePriority.HIGHEST): Boolean`
+- `sendSMS(numbers: List<String>, message: String, senderId: String = this.senderId, priority: MessagePriority = MessagePriority.HIGH): Boolean`
   Send an SMS to multiple numbers.
 
-- `querySendSMS(numbers: List<String>, message: String, senderId: String, priority: MessagePriority): ApiResponse?`
-  Send SMS and get the full API response.
+- `querySendSMS(number: String, message: String, senderId: String = this.senderId, priority: MessagePriority = MessagePriority.HIGH): ApiResponse?`
+- `querySendSMS(numbers: List<String>, message: String, senderId: String = this.senderId, priority: MessagePriority = MessagePriority.HIGH): ApiResponse?`
+  Same as `sendSMS`, but returns the full API response.
 
 - `getBalance(): Double?`
-  Get your SMS account balance.
+  Get your local wallet SMS account balance.
 
 - `queryBalance(): ApiResponse?`
-  Get the full API response for balance.
+  Get the full API response for the local wallet balance.
 
 ### Properties
 

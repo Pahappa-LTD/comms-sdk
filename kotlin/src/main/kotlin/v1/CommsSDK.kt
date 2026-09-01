@@ -3,10 +3,9 @@ package v1
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.client.RestTemplate
 import v1.models.*
-import v1.utils.NumberValidator
-import v1.utils.Validator
+import v1.utils.*
 
-class CommsSDK {
+final class CommsSDK {
     var userName: String = ""
         private set
     var apiKey: String = ""
@@ -25,7 +24,7 @@ class CommsSDK {
             val commsSDK = CommsSDK()
             commsSDK.userName = userName
             commsSDK.apiKey = apiKey
-            Validator.validateCredentials(commsSDK)
+            commsSDK.isAuthenticated = Validator.validateCredentials(commsSDK)
             return commsSDK
         }
 
@@ -51,10 +50,6 @@ class CommsSDK {
 
     }
 
-    fun setAuthenticated() {
-        this.isAuthenticated = true
-    }
-
     fun withSenderId(senderId: String): CommsSDK {
         this.senderId = senderId
         return this
@@ -64,7 +59,7 @@ class CommsSDK {
         number: String,
         message: String,
         senderId: String = this.senderId,
-        priority: MessagePriority = MessagePriority.HIGHEST
+        priority: MessagePriority = MessagePriority.HIGH
     ): Boolean {
         return sendSMS(listOf(number), message, senderId, priority)
     }
@@ -73,7 +68,7 @@ class CommsSDK {
         numbers: List<String>,
         message: String,
         senderId: String = this.senderId,
-        priority: MessagePriority = MessagePriority.HIGHEST
+        priority: MessagePriority = MessagePriority.HIGH
     ): Boolean {
         val apiResponse = querySendSMS(numbers, message, senderId, priority)
         if (apiResponse == null) {
@@ -97,10 +92,20 @@ class CommsSDK {
 
     /** Same as [sendSMS] but returns the full [ApiResponse] object. */
     fun querySendSMS(
+        number: String,
+        message: String,
+        senderId: String = this.senderId,
+        priority: MessagePriority = MessagePriority.HIGH
+    ): ApiResponse? {
+        return querySendSMS(listOf(number), message, senderId, priority)
+    }
+
+    /** Same as [sendSMS] but returns the full [ApiResponse] object. */
+    fun querySendSMS(
         numbers: List<String>,
         message: String,
-        senderId: String,
-        priority: MessagePriority
+        senderId: String = this.senderId,
+        priority: MessagePriority = MessagePriority.HIGH
     ): ApiResponse? {
         var numbers = numbers
         var senderId = senderId
@@ -150,7 +155,8 @@ class CommsSDK {
         if (!isAuthenticated) {
             System.err.println("SDK is not authenticated. Please authenticate before performing actions.")
             System.err.println("Attempting to re-authenticate with provided credentials...")
-            return !Validator.validateCredentials(this)
+            isAuthenticated = Validator.validateCredentials(this);
+            return !isAuthenticated;
         }
         return false
     }

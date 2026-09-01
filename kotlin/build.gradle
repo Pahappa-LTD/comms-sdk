@@ -1,9 +1,17 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version "1.9.0"  // replace with your Kotlin version
     id 'application'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    // To get the credentials from settings.xml
+    id 'net.linguica.maven-settings' version "0.5"
 }
 
-version = '1.0.1'
+group = "com.pahappa.systems"
+version = '1.1.0'
 
 repositories {
     mavenCentral()
@@ -37,12 +45,52 @@ dependencies {
     // add other dependencies here
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("com.pahappa.systems:comms-kotlin-sdk:1.0.1")
 }
 
 application {
     mainClass = 'MainKt'  // replace with your main class containing main() function
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions.jvmTarget = "1.8"  // target JVM version
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+
+            artifactId = 'comms-kotlin-sdk'
+            from components.java
+
+            pom {
+                name = 'Comms Kotlin SDK'
+                description = 'Comms SDK for Kotlin'
+                url = 'https://github.com/Pahappa-LTD/comms-sdk/tree/main/kotlin'
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "https://repo1.maven.org/maven2/"
+            def snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = project.findProperty("mavenCentral.username")
+                password = project.findProperty("mavenCentral.password")
+            }
+        }
+    }
 }
