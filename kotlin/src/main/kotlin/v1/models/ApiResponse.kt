@@ -10,7 +10,7 @@ class ApiResponse {
     var message: String? = null
 
     @JsonProperty(value = "Cost")
-    var cost: Int? = null
+    var cost: Double? = null
 
     @JsonProperty(value = "MsgFollowUpUniqueCode")
     var messageFollowUpCode: String? = null
