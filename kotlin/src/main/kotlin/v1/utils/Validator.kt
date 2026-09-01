@@ -57,7 +57,7 @@ object Validator {
                 }
                 null -> return false
             }
-        } catch (e: Error) {
+        } catch (e: Exception) {
             println("Error validating credentials: " + e.message)
             return false
         }
