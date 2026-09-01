@@ -1,7 +1,7 @@
 import sys
 from typing import List, Optional
 import requests
-from .models import ApiRequest, ApiResponse, ApiResponseCode, MessageModel, MessagePriority, UserData
+from .models import ApiRequest, ApiResponse, ApiResponseCode, MessageModel, MessagePriority, UserData, WalletType
 from .utils import NumberValidator, Validator
 
 class CommsSDK:
@@ -95,7 +95,7 @@ class CommsSDK:
             print("No valid phone numbers provided. Please check inputs.", file=sys.stderr)
             return None
 
-        api_request = ApiRequest(method="SendSms", userdata=UserData(self._user_name, self._api_key))
+        api_request = ApiRequest(method="SendSms", userdata=UserData(self._user_name, self._api_key), wallet_type=WalletType.LOCAL)
         message_models = []
         for num in numbers:
             message_model = MessageModel(number=num, message=message, senderid=sender_id, priority=priority.value)
@@ -123,11 +123,12 @@ class CommsSDK:
     def __str__(self) -> str:
         return f"SDK({self._user_name} => {self._api_key})"
 
-    def query_balance(self) -> Optional[ApiResponse]:
+    def query_balance(self, wallet_type: Optional[WalletType] = None) -> Optional[ApiResponse]:
         if self._sdk_not_authenticated():
             return None
 
-        api_request = ApiRequest(method="Balance", userdata=UserData(self._user_name, self._api_key))
+        wallet_type = wallet_type or WalletType.LOCAL
+        api_request = ApiRequest(method="Balance", userdata=UserData(self._user_name, self._api_key), wallet_type=wallet_type)
 
         try:
             res = self._client.post(CommsSDK.API_URL, json=api_request.to_dict())
@@ -135,6 +136,6 @@ class CommsSDK:
         except Exception as e:
             raise RuntimeError(f"Failed to get balance: {e}") from e
 
-    def get_balance(self) -> Optional[float]:
-        response = self.query_balance()
+    def get_balance(self, wallet_type: Optional[WalletType] = None) -> Optional[float]:
+        response = self.query_balance(wallet_type)
         return float(response.Balance) if response and response.Balance else None

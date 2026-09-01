@@ -28,6 +28,17 @@ class MessagePriority(Enum):
                 return priority
         raise ValueError(f"Unknown priority value: {text}")
 
+class WalletType(Enum):
+    LOCAL = "Local"
+    INTERNATIONAL = "International"
+
+    @classmethod
+    def from_value(cls, text: str):
+        for wallet_type in cls:
+            if wallet_type.value == text:
+                return wallet_type
+        raise ValueError(f"Unknown wallet type value: {text}")
+
 class JSONSerializable:
     def to_dict(self):
         return asdict(self)
@@ -58,11 +69,13 @@ class ApiRequest(JSONSerializable):
     method: str
     userdata: UserData
     msgdata: Optional[List[MessageModel]] = None
+    wallet_type: Optional[WalletType] = None
     def to_dict(self):
         return {
             "method": self.method,
             "userdata": self.userdata.to_dict(),
-            "msgdata": [msg.to_dict() for msg in self.msgdata] if self.msgdata else None
+            "msgdata": [msg.to_dict() for msg in self.msgdata] if self.msgdata else None,
+            "walletType": self.wallet_type.value if self.wallet_type else None
         }
 
 @dataclass

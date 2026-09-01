@@ -1,7 +1,7 @@
 import re
 from typing import List, Set
 
-from .models import ApiRequest, ApiResponse, ApiResponseCode, UserData
+from .models import ApiRequest, ApiResponse, ApiResponseCode, UserData, WalletType
 import requests
 import sys
 
@@ -56,7 +56,7 @@ class Validator:
     @staticmethod
     def _is_valid_credential(sdk) -> bool:
         client = requests.Session()
-        api_request = ApiRequest(method="Balance",userdata=UserData(sdk.user_name, sdk.api_key))
+        api_request = ApiRequest(method="Balance", userdata=UserData(sdk.user_name, sdk.api_key), wallet_type=WalletType.LOCAL)
         req = api_request.to_dict()
         
         try:
