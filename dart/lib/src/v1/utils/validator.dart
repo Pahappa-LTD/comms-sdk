@@ -23,7 +23,7 @@ class Validator {
       return false;
     }
     print("Validated using basic auth");
-    sdk.isAuthenticated = true;
+    sdk.setAuthenticated();
     return true;
   }
 
