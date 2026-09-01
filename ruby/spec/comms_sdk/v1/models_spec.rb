@@ -215,7 +215,6 @@ RSpec.describe 'CommsSdk::V1 Models' do
           status: "OK",
           message: "Success",
           cost: 50,
-          currency: "UGX",
           msg_follow_up_unique_code: "ABC123",
           balance: "100.50"
         )
@@ -223,7 +222,6 @@ RSpec.describe 'CommsSdk::V1 Models' do
         expect(response.status).to eq("OK")
         expect(response.message).to eq("Success")
         expect(response.cost).to eq(50)
-        expect(response.currency).to eq("UGX")
         expect(response.msg_follow_up_unique_code).to eq("ABC123")
         expect(response.balance).to eq("100.50")
       end
@@ -234,7 +232,6 @@ RSpec.describe 'CommsSdk::V1 Models' do
         expect(response.status).to eq("OK")
         expect(response.message).to be_nil
         expect(response.cost).to be_nil
-        expect(response.currency).to be_nil
         expect(response.msg_follow_up_unique_code).to be_nil
         expect(response.balance).to be_nil
       end
@@ -246,7 +243,6 @@ RSpec.describe 'CommsSdk::V1 Models' do
           "Status" => "OK",
           "Message" => "Success",
           "Cost" => 50,
-          "Currency" => "UGX",
           "MsgFollowUpUniqueCode" => "ABC123",
           "Balance" => "100.50"
         }
@@ -256,7 +252,6 @@ RSpec.describe 'CommsSdk::V1 Models' do
         expect(response.status).to eq("OK")
         expect(response.message).to eq("Success")
         expect(response.cost).to eq(50)
-        expect(response.currency).to eq("UGX")
         expect(response.msg_follow_up_unique_code).to eq("ABC123")
         expect(response.balance).to eq("100.50")
       end

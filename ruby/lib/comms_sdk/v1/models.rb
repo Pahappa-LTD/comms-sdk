@@ -119,13 +119,12 @@ module CommsSdk
     end
 
     class ApiResponse
-      attr_reader :status, :message, :cost, :currency, :msg_follow_up_unique_code, :balance
+      attr_reader :status, :message, :cost, :msg_follow_up_unique_code, :balance
 
-      def initialize(status:, message: nil, cost: nil, currency: nil, msg_follow_up_unique_code: nil, balance: nil)
+      def initialize(status:, message: nil, cost: nil, msg_follow_up_unique_code: nil, balance: nil)
         @status = status
         @message = message
         @cost = cost
-        @currency = currency
         @msg_follow_up_unique_code = msg_follow_up_unique_code
         @balance = balance
       end
@@ -135,7 +134,6 @@ module CommsSdk
           status: hash["Status"],
           message: hash["Message"],
           cost: hash["Cost"],
-          currency: hash["Currency"],
           msg_follow_up_unique_code: hash["MsgFollowUpUniqueCode"],
           balance: hash["Balance"]
         )
@@ -146,7 +144,6 @@ module CommsSdk
           "Status" => @status,
           "Message" => @message,
           "Cost" => @cost,
-          "Currency" => @currency,
           "MsgFollowUpUniqueCode" => @msg_follow_up_unique_code,
           "Balance" => @balance
         }.compact

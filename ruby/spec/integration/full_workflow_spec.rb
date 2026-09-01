@@ -47,8 +47,7 @@ RSpec.describe 'Full SDK Workflow Integration Test' do
           "Status" => "OK",
           "Message" => "SMS sent successfully",
           "MsgFollowUpUniqueCode" => "ABC123",
-          "Cost" => 50,
-          "Currency" => "UGX"
+          "Cost" => 50
         }.to_json,
         headers: { 'Content-Type' => 'application/json' }
       )

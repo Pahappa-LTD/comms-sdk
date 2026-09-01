@@ -93,7 +93,6 @@ begin
     puts "   Message: #{response.message}"
     puts "   Follow-up Code: #{response.msg_follow_up_unique_code}"
     puts "   Cost: #{response.cost}"
-    puts "   Currency: #{response.currency}"
   else
     puts "❌ No response received from query_send_sms"
   end

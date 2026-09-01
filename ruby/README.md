@@ -87,7 +87,6 @@ puts "Balance: #{balance}"
 response = sdk.query_balance
 puts "Status: #{response.status}"
 puts "Balance: #{response.balance}"
-puts "Currency: #{response.currency}"
 ```
 
 ### Configuration
@@ -158,8 +157,7 @@ sdk.with_sender_id("MyCustomSender")
 
 - `status` - Response status ("OK" or "Failed")
 - `message` - Response message
-- `cost` - Message cost
-- `currency` - Currency code
+- `cost` - Message cost (not always a whole number)
 - `msg_follow_up_unique_code` - Unique tracking code
 - `balance` - Account balance
 
