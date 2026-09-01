@@ -80,8 +80,8 @@ RSpec.describe 'CommsSdk::V1 Models' do
   end
 
   describe CommsSdk::V1::UserData do
-    let(:username) { "agabu-idaniel" }
-    let(:apikey) { "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99" }
+    let(:username) { "test-user" }
+    let(:apikey) { "test-api-key-0000000000000000000000000000000" }
     let(:user_data) { described_class.new(username, apikey) }
 
     describe '#initialize' do
@@ -159,7 +159,7 @@ RSpec.describe 'CommsSdk::V1 Models' do
   end
 
   describe CommsSdk::V1::ApiRequest do
-    let(:user_data) { CommsSdk::V1::UserData.new("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99") }
+    let(:user_data) { CommsSdk::V1::UserData.new("test-user", "test-api-key-0000000000000000000000000000000") }
     let(:message_model) do
       CommsSdk::V1::MessageModel.new(
         number: "256772123456",

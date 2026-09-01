@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 RSpec.describe 'Full SDK Workflow Integration Test' do
-  let(:username) { "agabu-idaniel" }
-  let(:api_key) { "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99" }
+  let(:username) { "test-user" }
+  let(:api_key) { "test-api-key-0000000000000000000000000000000" }
   let(:phone_number) { "+256772123456" }
   let(:message) { "Hello from Ruby SDK!" }
 

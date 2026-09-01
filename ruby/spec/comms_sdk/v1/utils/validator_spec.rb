@@ -6,8 +6,8 @@ require 'webmock/rspec'
 RSpec.describe CommsSdk::V1::Utils::Validator do
   let(:mock_sdk) do
     double('CommsSdk',
-      user_name: 'agabu-idaniel',
-      api_key: 'dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99',
+      user_name: 'test-user',
+      api_key: 'test-api-key-0000000000000000000000000000000',
       set_authenticated: nil
     )
   end
@@ -62,6 +62,13 @@ RSpec.describe CommsSdk::V1::Utils::Validator do
       it 'prints success messages' do
         expect { described_class.validate_credentials(mock_sdk) }
           .to output(/Credentials validated successfully.*Validated using basic auth/m).to_stdout
+      end
+
+      it 'sends an explicit Local walletType on the credential check (never omitted or nil)' do
+        described_class.validate_credentials(mock_sdk)
+
+        expect(WebMock).to have_requested(:post, CommsSdk::V1::CommsSDK::API_URL)
+          .with(body: hash_including("method" => "Balance", "walletType" => "Local"))
       end
     end
 

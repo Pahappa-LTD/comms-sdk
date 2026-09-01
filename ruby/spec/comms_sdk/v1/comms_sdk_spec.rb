@@ -4,8 +4,8 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 RSpec.describe CommsSdk::V1::CommsSDK do
-  let(:test_username) { "agabu-idaniel" }
-  let(:test_api_key) { "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99" }
+  let(:test_username) { "test-user" }
+  let(:test_api_key) { "test-api-key-0000000000000000000000000000000" }
   let(:test_phone) { "+256772123456" }
   let(:test_message) { "Test message" }
   
@@ -207,6 +207,32 @@ RSpec.describe CommsSdk::V1::CommsSDK do
         expect(result).to be false
       end
     end
+
+    context 'wallet type regression guard' do
+      before do
+        stub_sms_request(sms_success_response)
+      end
+
+      it 'always sends an explicit Local walletType (never omitted or nil)' do
+        sdk.send_sms(test_phone, test_message)
+
+        expect(WebMock).to have_requested(:post, described_class::API_URL)
+          .with(body: hash_including("method" => "SendSms", "walletType" => "Local"))
+      end
+    end
+
+    context 'default priority' do
+      before do
+        stub_sms_request(sms_success_response)
+      end
+
+      it 'defaults to HIGH priority when unspecified' do
+        sdk.send_sms(test_phone, test_message)
+
+        expect(WebMock).to have_requested(:post, described_class::API_URL)
+          .with { |req| JSON.parse(req.body)["msgdata"].all? { |m| m["priority"] == CommsSdk::V1::MessagePriority::HIGH.value } }
+      end
+    end
   end
 
   describe '#query_send_sms' do
@@ -286,10 +312,24 @@ RSpec.describe CommsSdk::V1::CommsSDK do
 
     it 'returns full API response' do
       response = sdk.query_balance
-      
+
       expect(response).to be_a(CommsSdk::V1::ApiResponse)
       expect(response.status).to eq("OK")
       expect(response.balance).to eq("100.50")
+    end
+
+    it 'sends an explicit Local walletType by default' do
+      sdk.query_balance
+
+      expect(WebMock).to have_requested(:post, described_class::API_URL)
+        .with(body: hash_including("method" => "Balance", "walletType" => "Local"))
+    end
+
+    it 'sends the requested wallet type when explicitly provided' do
+      sdk.query_balance(wallet_type: CommsSdk::V1::WalletType::INTERNATIONAL)
+
+      expect(WebMock).to have_requested(:post, described_class::API_URL)
+        .with(body: hash_including("method" => "Balance", "walletType" => "International"))
     end
   end
 
