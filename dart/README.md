@@ -84,7 +84,6 @@ print('Balance: $balance');
 final balanceResponse = await sdk.queryBalance();
 print('Status: ${balanceResponse?.status}');
 print('Balance: ${balanceResponse?.balance}');
-print('Currency: ${balanceResponse?.currency}');
 ```
 
 ### Configuration
@@ -149,8 +148,7 @@ sdk.withSenderId('MyCustomSender');
 
 - `status` - Response status ("OK" or "Failed")
 - `message` - Response message
-- `cost` - Message cost
-- `currency` - Currency code
+- `cost` - Message cost (not always a whole number)
 - `msgFollowUpUniqueCode` - Unique tracking code
 - `balance` - Account balance
 
