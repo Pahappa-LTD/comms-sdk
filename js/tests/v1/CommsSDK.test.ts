@@ -1,14 +1,19 @@
 import { CommsSDK } from '../../src/';
 import { MessagePriority } from '../../src/';
 
-describe('CommsSDK', () => {
+// Live sandbox smoke test: hits https://comms-test.pahappa.net for real.
+// Skipped entirely unless COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY are set,
+// so the suite stays green (and network-free) for anyone without sandbox credentials.
+const username = process.env.COMMS_SANDBOX_USERNAME;
+const apiKey = process.env.COMMS_SANDBOX_API_KEY;
+const describeLive = username && apiKey ? describe : describe.skip;
+
+describeLive('CommsSDK (live sandbox)', () => {
     let sdk: CommsSDK;
-    const username = "sandbox" // replace with your sandbox credentials
-    const apiKey = "sandbox35" // replace with your sandbox credentials
 
     beforeEach(() => {
         CommsSDK.useSandBox();
-        sdk = CommsSDK.authenticate(username, apiKey);
+        sdk = CommsSDK.authenticate(username as string, apiKey as string);
     });
 
     test('testSendSMSToSingleNumber', async () => {
