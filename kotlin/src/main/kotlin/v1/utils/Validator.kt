@@ -10,6 +10,7 @@ import v1.models.ApiRequest
 import v1.models.ApiResponse
 import v1.models.ApiResponseCode
 import v1.models.UserData
+import v1.models.WalletType
 
 
 object Validator {
@@ -41,6 +42,7 @@ object Validator {
         val apiRequest = ApiRequest()
         apiRequest.method = "Balance"
         apiRequest.userdata = UserData(sdk.userName, sdk.apiKey)
+        apiRequest.walletType = WalletType.LOCAL
         try {
             val res: ResponseEntity<String> = client.postForEntity(API_URL, apiRequest)
             val apiResponse: ApiResponse = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)

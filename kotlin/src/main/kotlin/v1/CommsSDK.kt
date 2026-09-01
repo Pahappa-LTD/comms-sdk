@@ -137,6 +137,7 @@ final class CommsSDK {
         }
         apiRequest.messageData = messageModels
         apiRequest.userdata = UserData(userName, apiKey)
+        apiRequest.walletType = WalletType.LOCAL
         val res = client.postForEntity(API_URL, apiRequest, String::class.java)
 
         try {
@@ -162,13 +163,14 @@ final class CommsSDK {
     }
 
     /** Same as [getBalance] but returns the full [ApiResponse] object. */
-    fun queryBalance(): ApiResponse? {
+    fun queryBalance(walletType: WalletType = WalletType.LOCAL): ApiResponse? {
         if (sdkNotAuthenticated()) {
             return null
         }
         val apiRequest = ApiRequest()
         apiRequest.method = "Balance"
         apiRequest.userdata = UserData(userName, apiKey)
+        apiRequest.walletType = walletType
         try {
             val res = client.postForEntity(API_URL, apiRequest, String::class.java)
             val response = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)
@@ -178,8 +180,8 @@ final class CommsSDK {
         }
     }
 
-    fun getBalance(): Double? {
-        val response = queryBalance()
+    fun getBalance(walletType: WalletType = WalletType.LOCAL): Double? {
+        val response = queryBalance(walletType)
         return response?.balance
     }
 

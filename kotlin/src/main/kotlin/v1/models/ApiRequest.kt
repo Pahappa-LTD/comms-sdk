@@ -11,4 +11,7 @@ class ApiRequest {
 
     @JsonProperty(value = "msgdata")
     var messageData: MutableList<MessageModel>? = null
+
+    @JsonProperty(value = "walletType")
+    var walletType: WalletType? = null
 }
