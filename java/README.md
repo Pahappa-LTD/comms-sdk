@@ -2,7 +2,7 @@
 
 A modern, easy-to-use Java SDK for sending SMS and querying balances via the Comms platform.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 **Package:** `com.pahappa.systems.commssdk.v1`
 
 ---
@@ -15,14 +15,14 @@ Add the SDK to your project as a dependency. If using Maven:
 <dependency>
   <groupId>com.pahappa.systems</groupId>
   <artifactId>commssdk</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 If using Gradle:
 
 ```groovy
-implementation 'com.pahappa.systems:commssdk:1.0.1'
+implementation 'com.pahappa.systems:commssdk:1.1.0'
 ```
 
 Or manually include the JAR in your classpath.
@@ -126,14 +126,22 @@ public class Example {
 - `boolean sendSMS(List<String> numbers, String message, String senderId, MessagePriority priority)`
   Sends SMS to one or more numbers. Returns `true` if successful.
 
+- `ApiResponse querySendSMS(String number, String message)`
+- `ApiResponse querySendSMS(String number, String message, String senderId)`
+- `ApiResponse querySendSMS(String number, String message, String senderId, MessagePriority priority)`
+- `ApiResponse querySendSMS(List<String> numbers, String message)`
+- `ApiResponse querySendSMS(List<String> numbers, String message, String senderId)`
+- `ApiResponse querySendSMS(List<String> numbers, String message, MessagePriority priority)`
 - `ApiResponse querySendSMS(List<String> numbers, String message, String senderId, MessagePriority priority)`
-  Sends SMS and returns the full API response object.
+  Same as `sendSMS`, but returns the full API response object.
 
 - `double getBalance()`
-  Returns your current SMS balance.
+- `double getBalance(WalletType walletType)`
+  Returns your current SMS balance. Defaults to `WalletType.LOCAL`.
 
 - `ApiResponse queryBalance()`
-  Returns the full API response for balance queries.
+- `ApiResponse queryBalance(WalletType walletType)`
+  Returns the full API response for balance queries. Defaults to `WalletType.LOCAL`.
 
 ### Properties
 
@@ -151,6 +159,13 @@ public class Example {
 - `MessagePriority.MEDIUM`
 - `MessagePriority.LOW`
 - `MessagePriority.LOWEST`
+
+---
+
+## WalletType Enum
+
+- `WalletType.LOCAL` (default)
+- `WalletType.INTERNATIONAL`
 
 ---
 
