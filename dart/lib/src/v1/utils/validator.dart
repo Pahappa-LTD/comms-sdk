@@ -5,7 +5,6 @@ import '../models/api_request.dart';
 import '../models/api_response.dart';
 import '../models/user_data.dart';
 import '../models/wallet_type.dart';
-import 'package:http/http.dart' as http;
 
 class Validator {
   static Future<bool> validateCredentials(CommsSDK sdk) async {
@@ -29,7 +28,7 @@ class Validator {
   }
 
   static Future<bool> _isValidCredential(CommsSDK sdk) async {
-    final client = http.Client();
+    final client = sdk.httpClient;
     final apiRequest = ApiRequest(
       method: 'Balance',
       userdata: UserData(sdk.userName!, sdk.apiKey!),

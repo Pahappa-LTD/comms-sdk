@@ -20,15 +20,20 @@ class CommsSDK {
 
   String senderId = 'EgoSMS';
   bool _isAuthenticated = false;
-  final http.Client _client = http.Client();
+  final http.Client _client;
 
-  CommsSDK._();
+  /// The HTTP client used for all requests. Exposed so [Validator] (and
+  /// tests) can inject/reuse a mock client instead of hitting the network.
+  http.Client get httpClient => _client;
+
+  CommsSDK._({http.Client? client}) : _client = client ?? http.Client();
 
   static Future<CommsSDK> authenticate(
     String userName,
-    String apiKey,
-  ) async {
-    final sdk = CommsSDK._();
+    String apiKey, {
+    http.Client? client,
+  }) async {
+    final sdk = CommsSDK._(client: client);
     sdk.userName = userName;
     sdk.apiKey = apiKey;
     await Validator.validateCredentials(sdk);
