@@ -12,7 +12,7 @@
 
 A modern, multi-language SDK for sending SMS and querying balances via the EgoSMS Comms platform by Pahappa Limited.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 
 ---
 
@@ -30,7 +30,7 @@ A modern, multi-language SDK for sending SMS and querying balances via the EgoSM
 
 ### 1. Clone the repository
 
-```sh
+```powershell
 git clone https://github.com/pahappa-ltd/CommsSDK.git
 cd CommsSDK
 ```
@@ -39,7 +39,7 @@ cd CommsSDK
 
 Some language SDKs are managed as submodules. Run:
 
-```sh
+```powershell
 git submodule update --init --recursive
 ```
 
