@@ -1,16 +1,17 @@
 # CommsSDK for JavaScript/TypeScript
 
-**Version:** 1.0.3
 **Package:** `@pahappalimited/comms-sdk` (TypeScript/JavaScript)
 
 A modern, type-safe SDK for sending SMS and querying balances via the EgoSMS Comms API.
 Supports both Node.js and browser environments (with appropriate polyfills for HTTP).
 
+**Version:** 1.1.0
+
 ---
 
 ## Installation
 
-```sh
+```powershell
 npm install @pahappalimited/comms-sdk
 # or
 yarn add @pahappalimited/comms-sdk
@@ -41,7 +42,7 @@ const success = await sdk.sendSMS(
   ["+256700000001", "+256700000002"],
   "Hello from CommsSDK JS!",
   "MyBrand", // optional, defaults to sdk.senderId
-  MessagePriority.HIGHEST // optional, defaults to HIGHEST
+  MessagePriority.HIGHEST // optional, defaults to HIGH
 );
 
 console.log("SMS sent?", success);
@@ -102,7 +103,7 @@ try {
 |--------|-------------|
 | `withSenderId(senderId: string): CommsSDK` | Set sender ID for this instance. |
 | `sendSMS(numbers: string \| string[], message: string, senderId?: string, priority?: MessagePriority): Promise<boolean>` | Send SMS. Returns `true` if successful. |
-| `querySendSMS(numbers: string[], message: string, senderId: string, priority: MessagePriority): Promise<ApiResponse \| null>` | Send SMS and get full API response. |
+| `querySendSMS(numbers: string \| string[], message: string, senderId?: string, priority?: MessagePriority): Promise<ApiResponse \| null>` | Same as `sendSMS`, but returns the full API response. |
 | `getBalance(): Promise<number \| null>` | Get account balance (returns `null` on error). |
 | `queryBalance(): Promise<ApiResponse \| null>` | Get full balance API response. |
 

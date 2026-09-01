@@ -58,27 +58,14 @@ export class CommsSDK {
     return this._senderId;
   }
 
-  // public async sendSMS(
-  //     number: string,
-  //     message: string,
-  //     senderId: string = this._senderId,
-  //     priority: MessagePriority = MessagePriority.HIGHEST
-  // ): Promise<boolean>;
-  // public async sendSMS(
-  //     numbers: string[],
-  //     message: string,
-  //     senderId: string = this._senderId,
-  //     priority: MessagePriority = MessagePriority.HIGHEST
-  // ): Promise<boolean>;
   public async sendSMS(
     numbers: string | string[],
     message: string,
     senderId: string = this._senderId,
-    priority: MessagePriority = MessagePriority.HIGHEST,
+    priority: MessagePriority = MessagePriority.HIGH,
   ): Promise<boolean> {
-    const numbersArray = Array.isArray(numbers) ? numbers : [numbers];
     const apiResponse = await this.querySendSMS(
-      numbersArray,
+      numbers,
       message,
       senderId,
       priority,
@@ -104,14 +91,15 @@ export class CommsSDK {
   }
 
   public async querySendSMS(
-    numbers: string[],
+    numbers: string | string[],
     message: string,
-    senderId: string,
-    priority: MessagePriority,
+    senderId: string = this._senderId,
+    priority: MessagePriority = MessagePriority.HIGH,
   ): Promise<ApiResponse | null> {
     if (await this.sdkNotAuthenticated()) {
       return null;
     }
+    numbers = Array.isArray(numbers) ? numbers : [numbers];
     if (!numbers || numbers.length === 0) {
       throw new Error("Numbers list cannot be empty");
     }
