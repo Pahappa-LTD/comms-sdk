@@ -10,9 +10,7 @@ public class ApiResponse {
     @JsonProperty(value = "Message")
     private String message;
     @JsonProperty(value = "Cost")
-    private Integer cost;
-    @JsonProperty(value = "Currency")
-    private String currency;
+    private Double cost;
     @JsonProperty(value = "MsgFollowUpUniqueCode")
     private String messageFollowUpCode;
     @JsonProperty(value = "Balance")
