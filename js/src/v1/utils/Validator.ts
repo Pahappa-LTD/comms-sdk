@@ -1,6 +1,7 @@
 import { CommsSDK } from "../CommsSDK";
 import { ApiRequest } from "../models/ApiRequest";
 import { UserData } from "../models/UserData";
+import { WalletType } from "../models/WalletType";
 import axios from 'axios';
 
 export class Validator {
@@ -32,6 +33,7 @@ export class Validator {
         const apiRequest = new ApiRequest();
         apiRequest.setMethod('Balance');
         apiRequest.setUserdata(new UserData(sdk.userName, sdk.apiKey));
+        apiRequest.setWalletType(WalletType.LOCAL);
 
         try {
             console.log(`API_URL: ${CommsSDK.API_URL}`);

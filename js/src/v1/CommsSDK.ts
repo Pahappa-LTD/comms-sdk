@@ -3,6 +3,7 @@ import { ApiResponse } from "./models/ApiResponse";
 import { MessageModel } from "./models/MessageModel";
 import { MessagePriority } from "./models/MessagePriority";
 import { UserData } from "./models/UserData";
+import { WalletType } from "./models/WalletType";
 import { NumberValidator } from "./utils/NumberValidator";
 import { Validator } from "./utils/Validator";
 import axios from "axios";
@@ -140,6 +141,7 @@ export class CommsSDK {
 
     apiRequest.setMessageData(messageModels);
     apiRequest.setUserdata(new UserData(this._userName!, this._apiKey!));
+    apiRequest.setWalletType(WalletType.LOCAL);
 
     try {
       const response = await axios.post(CommsSDK.API_URL, apiRequest.toArray());
@@ -168,7 +170,9 @@ export class CommsSDK {
     return false;
   }
 
-  public async queryBalance(): Promise<ApiResponse | null> {
+  public async queryBalance(
+    walletType: WalletType = WalletType.LOCAL,
+  ): Promise<ApiResponse | null> {
     if (await this.sdkNotAuthenticated()) {
       return null;
     }
@@ -176,6 +180,7 @@ export class CommsSDK {
     const apiRequest = new ApiRequest();
     apiRequest.setMethod("Balance");
     apiRequest.setUserdata(new UserData(this._userName!, this._apiKey!));
+    apiRequest.setWalletType(walletType ?? WalletType.LOCAL);
 
     try {
       const response = await axios.post(CommsSDK.API_URL, apiRequest.toArray());
@@ -185,8 +190,10 @@ export class CommsSDK {
     }
   }
 
-  public async getBalance(): Promise<number | null> {
-    const response = await this.queryBalance();
+  public async getBalance(
+    walletType: WalletType = WalletType.LOCAL,
+  ): Promise<number | null> {
+    const response = await this.queryBalance(walletType);
     return response?.Balance ?? null;
   }
 
