@@ -7,6 +7,7 @@ import 'models/api_response.dart';
 import 'models/message_model.dart';
 import 'models/message_priority.dart';
 import 'models/user_data.dart';
+import 'models/wallet_type.dart';
 import 'utils/number_validator.dart';
 import 'utils/validator.dart';
 
@@ -140,6 +141,7 @@ class CommsSDK {
       method: 'SendSms',
       messageData: messageModels,
       userdata: UserData(userName!, apiKey!),
+      walletType: WalletType.local,
     );
 
     try {
@@ -168,7 +170,7 @@ class CommsSDK {
   }
 
   /// Same as [getBalance] but returns the full [ApiResponse] object.
-  Future<ApiResponse?> queryBalance() async {
+  Future<ApiResponse?> queryBalance({WalletType walletType = WalletType.local}) async {
     if (await _sdkNotAuthenticated()) {
       return null;
     }
@@ -176,6 +178,7 @@ class CommsSDK {
       method: 'Balance',
       userdata: UserData(userName!, apiKey!),
       messageData: [],
+      walletType: walletType,
     );
     try {
       final res = await _client.post(
@@ -189,8 +192,8 @@ class CommsSDK {
     }
   }
 
-  Future<double?> getBalance() async {
-    final response = await queryBalance();
+  Future<double?> getBalance({WalletType walletType = WalletType.local}) async {
+    final response = await queryBalance(walletType: walletType);
     return response?.balance != null ? double.tryParse(response!.balance!) : null;
   }
 

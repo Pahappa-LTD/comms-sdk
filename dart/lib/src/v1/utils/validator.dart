@@ -4,6 +4,7 @@ import '../comms_sdk.dart';
 import '../models/api_request.dart';
 import '../models/api_response.dart';
 import '../models/user_data.dart';
+import '../models/wallet_type.dart';
 import 'package:http/http.dart' as http;
 
 class Validator {
@@ -32,6 +33,7 @@ class Validator {
     final apiRequest = ApiRequest(
       method: 'Balance',
       userdata: UserData(sdk.userName!, sdk.apiKey!),
+      walletType: WalletType.local,
     );
     try {
       final res = await client.post(
