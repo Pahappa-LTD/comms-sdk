@@ -72,7 +72,7 @@ pub struct ApiRequest {
     pub userdata: UserData,
     #[serde(rename = "msgdata")]
     pub message_data: Option<Vec<MessageModel>>,
-    #[serde(rename = "walletType")]
+    #[serde(rename = "walletType", skip_serializing_if = "Option::is_none")]
     pub wallet_type: Option<WalletType>,
 }
 

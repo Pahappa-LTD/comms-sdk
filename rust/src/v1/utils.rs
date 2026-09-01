@@ -9,7 +9,7 @@ use reqwest::blocking::Client;
 use crate::models::PhoneNumbers;
 
 use super::{
-    API_URL, CommsSDK, models::{ApiRequest, ApiResponse, ApiResponseCode, UserData}
+    API_URL, CommsSDK, models::{ApiRequest, ApiResponse, ApiResponseCode, UserData, WalletType}
 };
 
 pub fn validate_numbers(numbers: PhoneNumbers) -> Vec<String> {
@@ -62,7 +62,7 @@ fn is_valid_credential(sdk: &CommsSDK) -> bool {
         method: "Balance".into(),
         userdata: UserData::new(&sdk.user_name, &sdk.api_key),
         message_data: None,
-        wallet_type: None,
+        wallet_type: Some(WalletType::default()),
     };
     return match client.post(unsafe { API_URL }).json(&request).send() {
         Ok(response) => {

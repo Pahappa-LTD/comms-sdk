@@ -182,7 +182,7 @@ impl CommsSDK {
                 password: self.api_key.clone(),
             },
             message_data: message_models,
-            wallet_type: None,
+            wallet_type: Some(WalletType::default()),
         };
 
         match self
