@@ -6,6 +6,15 @@ use serial_test::serial;
 // HTTP call) must not run concurrently with another such test — hence #[serial]
 // on every test in this file.
 
+// Sandbox credentials are never hardcoded here — read from the environment so
+// this file is safe to commit and to run without network access. Tests that
+// need them skip cleanly (print + early return, not a failure) when unset.
+fn sandbox_credentials() -> Option<(String, String)> {
+    let username = std::env::var("COMMS_SANDBOX_USERNAME").ok()?;
+    let api_key = std::env::var("COMMS_SANDBOX_API_KEY").ok()?;
+    Some((username, api_key))
+}
+
 #[test]
 #[serial]
 fn test_new() {
@@ -33,8 +42,14 @@ fn test_send_sms_failure() {
 #[test]
 #[serial]
 fn test_send_sms_success() {
+    let Some((username, api_key)) = sandbox_credentials() else {
+        eprintln!(
+            "Skipping test_send_sms_success: set COMMS_SANDBOX_USERNAME and COMMS_SANDBOX_API_KEY to run it"
+        );
+        return;
+    };
     CommsSDK::use_sandbox(); // for testing at https://comms-test.pahappa.net/api/v1/json/
-    let sdk = CommsSDK::authenticate("aganidaniel", "466be53e8ba7eea6c6b6f6d3d6e166652ed4e7eebe50bf3b").unwrap(); // replace with appropriate credentials
+    let sdk = CommsSDK::authenticate(&username, &api_key).unwrap();
     let numbers = vec!["256700000000"];
     let message = "Test message from Rust";
     let result = sdk.query_send_sms(numbers, message).unwrap();
@@ -45,8 +60,14 @@ fn test_send_sms_success() {
 #[test]
 #[serial]
 fn test_balance_sandbox() {
+    let Some((username, api_key)) = sandbox_credentials() else {
+        eprintln!(
+            "Skipping test_balance_sandbox: set COMMS_SANDBOX_USERNAME and COMMS_SANDBOX_API_KEY to run it"
+        );
+        return;
+    };
     CommsSDK::use_sandbox();
-    let sdk = CommsSDK::authenticate("aganidaniel", "466be53e8ba7eea6c6b6f6d3d6e166652ed4e7eebe50bf3b").unwrap();
+    let sdk = CommsSDK::authenticate(&username, &api_key).unwrap();
     assert!(sdk.is_authenticated()); // provided credentials were correct
     let result = sdk.get_balance().unwrap();
     assert!(result >= 0.0);
