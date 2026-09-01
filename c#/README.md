@@ -2,7 +2,7 @@
 
 A C# implementation of the CommsSDK for sending SMS and managing communications, following the same patterns as the Python, Ruby, and Kotlin reference implementations.
 
-**Version:** 1.0.1
+**Version:** 1.1.0
 
 ---
 
@@ -22,7 +22,7 @@ A C# implementation of the CommsSDK for sending SMS and managing communications,
 Add the NuGet package (when available):
 
 ```
-dotnet add package CommsSDK --version 1.0.1
+dotnet add package CommsSDK --version 1.1.0
 ```
 
 Or reference the library project directly in your solution.
@@ -114,8 +114,13 @@ sdk = sdk.WithSenderId("MyCustomSender");
   - Send SMS to a single number with custom sender ID and priority.
 - `Task<bool> SendSms(List<string> numbers, string message, string senderId, MessagePriority priority)`
   - Send SMS to multiple numbers with custom sender ID and priority.
+- `Task<ApiResponse?> QuerySendSms(string number, string message)`
+- `Task<ApiResponse?> QuerySendSms(List<string> numbers, string message)`
+- `Task<ApiResponse?> QuerySendSms(string number, string message, string senderId)`
+- `Task<ApiResponse?> QuerySendSms(List<string> numbers, string message, string senderId)`
+- `Task<ApiResponse?> QuerySendSms(string number, string message, string senderId, MessagePriority priority)`
 - `Task<ApiResponse?> QuerySendSms(List<string> numbers, string message, string senderId, MessagePriority priority)`
-  - Send SMS and get full API response.
+  - Same as `SendSms`, but returns the full API response.
 - `Task<double?> GetBalance()`
   - Get account balance as double.
 - `Task<ApiResponse?> QueryBalance()`

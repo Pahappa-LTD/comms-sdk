@@ -55,10 +55,10 @@ namespace Comms
         }
 
         public Task<bool> SendSms(string number, string message) =>
-            SendSms(new List<string> { number }, message, SenderId, MessagePriority.Highest);
+            SendSms(new List<string> { number }, message, SenderId, MessagePriority.High);
 
         public Task<bool> SendSms(string number, string message, string senderId) =>
-            SendSms(new List<string> { number }, message, senderId, MessagePriority.Highest);
+            SendSms(new List<string> { number }, message, senderId, MessagePriority.High);
 
         public Task<bool> SendSms(string number, string message, string senderId, MessagePriority priority) =>
             SendSms(new List<string> { number }, message, senderId, priority);
@@ -67,10 +67,10 @@ namespace Comms
             SendSms(new List<string> { number }, message, SenderId, priority);
 
         public Task<bool> SendSms(List<string> numbers, string message) =>
-            SendSms(numbers, message, SenderId, MessagePriority.Highest);
+            SendSms(numbers, message, SenderId, MessagePriority.High);
 
         public Task<bool> SendSms(List<string> numbers, string message, string senderId) =>
-            SendSms(numbers, message, senderId, MessagePriority.Highest);
+            SendSms(numbers, message, senderId, MessagePriority.High);
 
         public Task<bool> SendSms(List<string> numbers, string message, MessagePriority priority) =>
             SendSms(numbers, message, SenderId, priority);
@@ -97,6 +97,34 @@ namespace Comms
                     throw new Exception("Unexpected response status: " + apiResponse.Status);
             }
         }
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(string number, string message) =>
+            QuerySendSms(new List<string> { number }, message, SenderId, MessagePriority.High);
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(string number, string message, string senderId) =>
+            QuerySendSms(new List<string> { number }, message, senderId, MessagePriority.High);
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(string number, string message, string senderId, MessagePriority priority) =>
+            QuerySendSms(new List<string> { number }, message, senderId, priority);
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(string number, string message, MessagePriority priority) =>
+            QuerySendSms(new List<string> { number }, message, SenderId, priority);
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(List<string> numbers, string message) =>
+            QuerySendSms(numbers, message, SenderId, MessagePriority.High);
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(List<string> numbers, string message, string senderId) =>
+            QuerySendSms(numbers, message, senderId, MessagePriority.High);
+
+        /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
+        public Task<ApiResponse?> QuerySendSms(List<string> numbers, string message, MessagePriority priority) =>
+            QuerySendSms(numbers, message, SenderId, priority);
 
         /// <summary>Same as <see cref="SendSms"/> but returns the full <see cref="ApiResponse"/> object.</summary>
         public async Task<ApiResponse?> QuerySendSms(List<string> numbers, string message, string senderId, MessagePriority priority)
