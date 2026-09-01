@@ -1,3 +1,4 @@
+import os
 import unittest
 import requests, comms_sdk
 from unittest.mock import patch, MagicMock
@@ -108,11 +109,38 @@ class TestValidator(unittest.TestCase):
             Validator.validate_credentials(None)
         self.assertIn("CommsSDK instance cannot be null", str(cm.exception))
 
+    @patch('requests.Session.post')
+    def test_is_valid_credential_sends_explicit_wallet_type_local(self, mock_post):
+        # Regression guard: the live sandbox rejects an explicit `walletType: null`
+        # on Balance checks (this broke authenticate() for Java/Rust earlier this
+        # session), so the credential-check request must always send "Local".
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"Status": "OK", "Message": "Success"}
+        mock_post.return_value = mock_response
+
+        sdk = CommsSDK()
+        sdk._username = "test_user"
+        sdk._api_key = "test_password"
+
+        with patch('sys.stdout', new=StringIO()):
+            Validator.validate_credentials(sdk)
+
+        args, kwargs = mock_post.call_args
+        self.assertEqual(kwargs['json']['walletType'], "Local")
+
+    @unittest.skipUnless(
+        os.environ.get("COMMS_SANDBOX_USERNAME") and os.environ.get("COMMS_SANDBOX_API_KEY"),
+        "COMMS_SANDBOX_USERNAME/COMMS_SANDBOX_API_KEY not set; skipping live sandbox test",
+    )
     def test_real(self):
         CommsSDK.use_sandbox()
-        sdk = CommsSDK.authenticate("agabu-idaniel", "dcfa634d7936ec699a3b26f6cd924801b09b285a31949f99")
+        sdk = CommsSDK.authenticate(
+            os.environ["COMMS_SANDBOX_USERNAME"],
+            os.environ["COMMS_SANDBOX_API_KEY"],
+        )
         self.assertIsNotNone(sdk.get_balance())
-        self.assertTrue(sdk.send_sms("0712345678","Message 1"))
+        self.assertTrue(sdk.send_sms("0712345678", "Message 1"))
 
 if __name__ == '__main__':
     unittest.main()
