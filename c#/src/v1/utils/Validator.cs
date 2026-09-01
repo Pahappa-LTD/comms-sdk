@@ -42,7 +42,8 @@ public static class Validator
         var apiRequest = new ApiRequest
         {
             Method = "Balance",
-            Userdata = new UserData(sdk.UserName!, sdk.ApiKey!)
+            Userdata = new UserData(sdk.UserName!, sdk.ApiKey!),
+            WalletType = WalletType.Local,
         };
 
         try

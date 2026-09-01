@@ -158,6 +158,7 @@ namespace Comms
                 Method = "SendSms",
                 MessageData = numbers.Select(num => new MessageModel(num, message, senderId ?? this.SenderId, priority)).ToList(),
                 Userdata = new UserData(UserName!, ApiKey!),
+                WalletType = Models.WalletType.Local,
             };
 
             try
@@ -192,14 +193,15 @@ namespace Comms
         }
 
         /// <summary>Same as <see cref="GetBalance"/> but returns the full <see cref="ApiResponse"/> object.</summary>
-        public async Task<ApiResponse?> QueryBalance()
+        public async Task<ApiResponse?> QueryBalance(Models.WalletType walletType = Models.WalletType.Local)
         {
             if (await SdkNotAuthenticated()) return null;
 
             var apiRequest = new ApiRequest
             {
                 Method = "Balance",
-                Userdata = new UserData(UserName!, ApiKey!)
+                Userdata = new UserData(UserName!, ApiKey!),
+                WalletType = walletType,
             };
 
             try
@@ -218,9 +220,9 @@ namespace Comms
             }
         }
 
-        public async Task<double?> GetBalance()
+        public async Task<double?> GetBalance(Models.WalletType walletType = Models.WalletType.Local)
         {
-            var response = await QueryBalance();
+            var response = await QueryBalance(walletType);
             return response?.Balance;
         }
 

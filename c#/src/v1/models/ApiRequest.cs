@@ -9,6 +9,8 @@ public class ApiRequest
     public string Method { get; set; }
     [JsonPropertyName("userdata")] 
     public UserData Userdata { get; set; }
-    [JsonPropertyName("msgdata")] 
+    [JsonPropertyName("msgdata")]
     public List<MessageModel>? MessageData{ get; set; }
+    [JsonPropertyName("walletType")]
+    public WalletType? WalletType { get; set; }
 }
