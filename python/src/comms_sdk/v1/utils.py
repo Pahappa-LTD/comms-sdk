@@ -9,7 +9,7 @@ class NumberValidator:
     _regex = r"^\+?(0|\d{3})\d{9}$"
 
     @staticmethod
-    def validate_numbers(numbers: List[str]) -> List[str]:
+    def validate_numbers(numbers: List[str] | None) -> List[str]:
         if not numbers:
             print("Number list cannot be null or empty", file=sys.stderr)
             return []

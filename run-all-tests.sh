@@ -61,7 +61,7 @@ run_lang "Java"   "java"   mvn -q test
 run_lang "Rust"   "rust"   cargo test
 run_lang "Kotlin" "kotlin" ./gradlew test --console=plain
 run_lang "JS/TS"  "js"     pnpm test
-run_lang "Python" "python" pytest
+run_lang "Python" "python" python -m pytest
 run_lang "Ruby"   "ruby"   bundle exec rspec
 run_lang "PHP"    "php"    ./vendor/bin/phpunit
 run_lang "Dart"   "dart"   dart test
