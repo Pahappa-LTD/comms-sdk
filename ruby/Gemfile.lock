@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    comms_sdk (1.0.0)
+    comms_sdk (1.1.0)
 
 GEM
   remote: https://rubygems.org/

@@ -192,7 +192,7 @@ RSpec.describe CommsSdk::V1::CommsSDK do
       end
 
       it 'returns nil for invalid numbers' do
-        result = sdk.query_send_sms(["123"], test_message, "EgoSMS", CommsSdk::V1::MessagePriority::HIGHEST)
+        result = sdk.query_send_sms(["123"], test_message, sender_id: "EgoSMS", priority: CommsSdk::V1::MessagePriority::HIGHEST)
         expect(result).to be_nil
       end
     end
@@ -244,10 +244,10 @@ RSpec.describe CommsSdk::V1::CommsSDK do
 
     it 'returns full API response' do
       response = sdk.query_send_sms(
-        [test_phone], 
-        test_message, 
-        "EgoSMS", 
-        CommsSdk::V1::MessagePriority::HIGHEST
+        [test_phone],
+        test_message,
+        sender_id: "EgoSMS",
+        priority: CommsSdk::V1::MessagePriority::HIGHEST
       )
       
       expect(response).to be_a(CommsSdk::V1::ApiResponse)

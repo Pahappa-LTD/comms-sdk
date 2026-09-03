@@ -70,7 +70,7 @@ RSpec.describe 'Full SDK Workflow Integration Test' do
     expect(success).to be true
 
     # Step 5: Get full SMS response
-    response = sdk.query_send_sms([phone_number], message, "RubySDK", CommsSdk::V1::MessagePriority::HIGHEST)
+    response = sdk.query_send_sms([phone_number], message, sender_id: "RubySDK", priority: CommsSdk::V1::MessagePriority::HIGHEST)
     expect(response).to be_a(CommsSdk::V1::ApiResponse)
     expect(response.status).to eq("OK")
     expect(response.msg_follow_up_unique_code).to eq("ABC123")

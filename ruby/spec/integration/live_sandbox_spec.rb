@@ -9,8 +9,8 @@ require 'webmock/rspec'
 # COMMS_SANDBOX_API_KEY are set in the environment, so it never fails (or runs)
 # without sandbox credentials, and no real credential ever needs to live in source.
 RSpec.describe 'CommsSdk live sandbox smoke test' do
-  username = ENV['COMMS_SANDBOX_USERNAME']
-  api_key = ENV['COMMS_SANDBOX_API_KEY']
+  let(:username) { ENV['COMMS_SANDBOX_USERNAME'] }
+  let(:api_key) { ENV['COMMS_SANDBOX_API_KEY'] }
 
   before do
     WebMock.allow_net_connect!
@@ -22,9 +22,9 @@ RSpec.describe 'CommsSdk live sandbox smoke test' do
   end
 
   def skip_unless_credentials!
-    if username.nil? || username.empty? || api_key.nil? || api_key.empty?
-      skip 'Set COMMS_SANDBOX_USERNAME and COMMS_SANDBOX_API_KEY to run this test'
-    end
+    return unless username.nil? || username.empty? || api_key.nil? || api_key.empty?
+
+    skip 'Set COMMS_SANDBOX_USERNAME and COMMS_SANDBOX_API_KEY to run this test'
   end
 
   it 'rejects wrong credentials against the sandbox' do
