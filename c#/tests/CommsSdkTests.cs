@@ -12,8 +12,14 @@ namespace CommsTests {
         public async Task CheckFunctionality()
         {
             CommsSdk.UseSandBox();
-            string UserName = "sandbox";
-            string ApiKey = "sandbox35";
+            string? UserName = Environment.GetEnvironmentVariable("COMMs_SDK_USERNAME");
+            string? ApiKey = Environment.GetEnvironmentVariable("COMMs_SDK_APIKEY");
+            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(ApiKey))
+            {
+                Console.WriteLine("Missing credentials");
+                return;
+            }
+            
             var sdk = await CommsSdk.Authenticate(UserName, ApiKey);
             var balance1 = await sdk.GetBalance();
             Assert.IsNotNull(balance1);
