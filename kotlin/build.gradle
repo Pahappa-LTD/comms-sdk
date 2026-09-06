@@ -1,13 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version "1.9.0"  // replace with your Kotlin version
+    id 'org.jetbrains.kotlin.jvm' version "1.9.0"
     id 'application'
     id 'java-library'
     id 'maven-publish'
-    id 'signing'
-    // To get the credentials from settings.xml
-    id 'net.linguica.maven-settings' version "0.5"
+    id 'org.jreleaser' version '1.26.0'
 }
 
 group = "com.pahappa.systems"
@@ -15,25 +13,18 @@ version = '1.1.0'
 
 repositories {
     mavenCentral()
-    // snapshots
     maven {
         url = 'https://central.sonatype.com/repository/maven-snapshots/'
-        mavenContent {
-            snapshotsOnly()
-        }
+        mavenContent { snapshotsOnly() }
     }
-    // snapshots
     maven {
         url = 'https://maven.pkg.github.com/pahappa-ltd/packages/'
-        mavenContent {
-            snapshotsOnly()
-        }
+        mavenContent { snapshotsOnly() }
         credentials {
-            username = "strongthedev"//project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            project.findProperty("gpr.key")  ?: System.getenv("GITHUB_TOKEN")
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
         }
     }
-
 }
 
 dependencies {
@@ -42,18 +33,18 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5")
     implementation("com.fasterxml.jackson.core:jackson-core:2.13.5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.5")
-    // add other dependencies here
+
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("com.pahappa.systems:comms-kotlin-sdk:1.0.1")
+    testImplementation("com.pahappa.systems:comms-kotlin-sdk:1.1.0")
 }
 
 application {
-    mainClass = 'MainKt'  // replace with your main class containing main() function
+    mainClass = 'CommsSDK'
 }
 
 tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions.jvmTarget = "1.8"  // target JVM version
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 java {
@@ -61,35 +52,82 @@ java {
     withSourcesJar()
 }
 
-signing {
-    useGpgCmd()
-    sign publishing.publications
-}
-
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-
+        maven(MavenPublication) {
+            groupId = group
             artifactId = 'comms-kotlin-sdk'
+            version = version
+
             from components.java
 
             pom {
-                name = 'Comms Kotlin SDK'
-                description = 'Comms SDK for Kotlin'
-                url = 'https://github.com/Pahappa-LTD/comms-sdk/tree/main/kotlin'
+                name = "Comms Kotlin SDK v$version"
+                description = "Comms SDK for Kotlin"
+                url = "https://github.com/Pahappa-LTD/comms-sdk"
+                inceptionYear = '2024'
+
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://opensource.org/licenses/MIT"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "daniel"
+                        name = "Daniel"
+                        email = "daniel@ug.pahappa.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://github.com/Pahappa-LTD/comms-kotlin-sdk.git"
+                    developerConnection = "scm:git:ssh://git@github.com/Pahappa-LTD/comms-kotlin-sdk.git"
+                    url = "https://github.com/Pahappa-LTD/comms-kotlin-sdk"
+                }
             }
         }
     }
+
     repositories {
         maven {
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = "https://repo1.maven.org/maven2/"
-            def snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            // JReleaser stages here first, then uploads to Central itself
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
 
-            credentials {
-                username = project.findProperty("mavenCentral.username")
-                password = project.findProperty("mavenCentral.password")
+var gpgApp = project.findProperty("gpg.executable")
+var gpgKey = project.findProperty("gpg.keyName")
+var gpgPass = project.findProperty("gpg.passphrase")
+var mvnUser = project.findProperty("mavenCentral.username")
+var mvnPass = project.findProperty("mavenCentral.password")
+
+jreleaser {
+    signing {
+        pgp {
+            active = 'ALWAYS'
+            armored = true
+            mode = 'COMMAND'
+            command {
+//                print("Key: $gpgKey\n")
+//                print("Pass: $gpgPass\n")
+                executable = gpgApp
+                keyName = gpgKey
+                passphrase = gpgPass
+            }
+        }
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                    username = mvnUser
+                    password = mvnPass
+                }
             }
         }
     }

@@ -28,9 +28,9 @@
     </developer>
   </developers>
   <scm>
-    <url>https://www.github.com/pahappa-ltd/CommsSDK</url>
-    <connection>scm:git:git@github.com:pahappa-ltd/CommsSDK.git</connection>
-    <developerConnection>scm:git:git@github.com:pahappa-ltd/CommsSDK.git</developerConnection>
+    <url>https://www.github.com/Pahappa-LTD/CommsSDK</url>
+    <connection>scm:git:git@github.com:Pahappa-LTD/CommsSDK.git</connection>
+    <developerConnection>scm:git:git@github.com:Pahappa-LTD/CommsSDK.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -94,11 +94,11 @@
       <plugin>
         <groupId>org.sonatype.central</groupId>
         <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.7.0</version>
+        <version>0.11.0</version>
         <extensions>true</extensions>
         <configuration>
           <publishingServerId>central</publishingServerId>
-          <deploymentName>Comms SDK v${version}</deploymentName>
+          <deploymentName>Comms SDK v${project.version}</deploymentName>
         </configuration>
       </plugin>
       <plugin>

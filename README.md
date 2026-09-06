@@ -179,6 +179,82 @@ sdk.SendSMS("+256700000001", "Hello from CommsSDK!")
 
 ---
 
+## Roadmap
+
+Planned API changes that will be rolled out to **every** language SDK. Each item below is
+tracked per-language with its own checkbox; check one off only once that language's SDK has
+actually implemented and tested the change.
+
+> **Note:** [`TESTS.md`](TESTS.md) will be updated to add dedicated test IDs for each of the
+> items below once the corresponding implementation work begins. Until then, `TESTS.md`
+> describes only the current, shipped behaviour — it does not yet cover these planned changes.
+
+### 1. Instance-based API URL (deprecate the global/static endpoint)
+
+Today the active endpoint (live vs. sandbox) is process-global configuration shared by every
+client instance (see `TESTS.md` §1, `ENV-*`). This will change so that each client instance
+carries its own endpoint, fixed at creation time:
+
+- Add `authenticate(username, apiKey)` — authenticates against the **live** endpoint
+  (`https://comms.egosms.co/api/v1/json/`) and returns a client instance bound to it.
+- Add `authenticateSandbox(username, apiKey)` — authenticates against the **sandbox** endpoint
+  (`https://comms-test.pahappa.net/api/v1/json/`) and returns a client instance bound to it.
+- Deprecate the static/global endpoint switches (e.g. `useSandBox()` / `useLiveServer()`, or each
+  language's equivalent) in favor of the two constructors above. Existing global switches should
+  keep working during a deprecation window, but new code should prefer the instance-based form.
+- Two client instances created with different constructors (one live, one sandbox) must be able
+  to coexist and operate independently in the same process, without one's endpoint choice
+  affecting the other.
+
+**Per-language status:**
+
+- [ ] Java
+- [ ] Kotlin
+- [ ] JavaScript/TypeScript
+- [ ] Python
+- [ ] Ruby
+- [ ] PHP
+- [ ] Rust
+- [ ] Dart
+- [ ] C#
+- [ ] Go
+
+### 2. Custom messages per number
+
+Today a single send call fans one message out to one or more numbers, always with the same text.
+This adds support for sending **different** message text to different recipients in a single
+call, via two new functions:
+
+- A function that accepts a list of message entries (number + message text + sender ID +
+  priority, i.e. the SDK's existing per-message model type) built directly by the caller. The
+  caller is responsible for pre-cleaning each phone number into valid international format
+  themselves (e.g. by running it through the SDK's existing number-validation helper) before
+  constructing each entry — this function does **not** validate or normalize numbers on the
+  caller's behalf, so an invalid number in the list will simply be rejected by the backend API
+  rather than being caught client-side.
+- A function that accepts a map/dictionary of phone number → message text. Here the SDK *does*
+  validate and normalize each key using its existing number-validation logic before building the
+  request. Any key that fails validation (doesn't match the accepted phone number shape) is
+  **silently discarded, along with its associated message** — it is the caller's responsibility
+  to supply numbers that will pass validation if they want them included. This mirrors the
+  existing validation shape used elsewhere in the SDK: an optional leading `+`, followed by
+  either a leading `0` or a 3-digit prefix, followed by exactly 9 more digits.
+
+**Per-language status:**
+
+- [ ] Java
+- [ ] Kotlin
+- [ ] JavaScript/TypeScript
+- [ ] Python
+- [ ] Ruby
+- [ ] PHP
+- [ ] Rust
+- [ ] Dart
+- [ ] C#
+- [ ] Go
+
+---
+
 ## Contributing
 
 Pull requests are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) if available, or open an issue to discuss your idea.

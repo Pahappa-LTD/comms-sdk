@@ -4,11 +4,10 @@
 gpr.user=
 gpr.key=
 
-# maven central credentials for publishing
+# central creds
 mavenCentral.username=
 mavenCentral.password=
 
-# gpg signing
-signing.gnupg.executable=gpg
-signing.gnupg.keyName=YOUR_KEY_ID
-signing.gnupg.passphrase=YOUR_PASSPHRASE
+gpg.executable=/path/to/gpg.exe
+gpg.keyName=
+gpg.passphrase=
