@@ -104,6 +104,11 @@ var mvnUser = project.findProperty("mavenCentral.username")
 var mvnPass = project.findProperty("mavenCentral.password")
 
 jreleaser {
+    release {
+        generic {
+            enabled = false
+        }
+    }
     signing {
         pgp {
             active = 'ALWAYS'
