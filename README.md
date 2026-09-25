@@ -208,8 +208,8 @@ carries its own endpoint, fixed at creation time:
 
 **Per-language status:**
 
-- [ ] Java
-- [ ] Kotlin
+- [x] Java
+- [x] Kotlin
 - [ ] JavaScript/TypeScript
 - [ ] Python
 - [ ] Ruby
@@ -223,27 +223,12 @@ carries its own endpoint, fixed at creation time:
 
 Today a single send call fans one message out to one or more numbers, always with the same text.
 This adds support for sending **different** message text to different recipients in a single
-call, via two new functions:
-
-- A function that accepts a list of message entries (number + message text + sender ID +
-  priority, i.e. the SDK's existing per-message model type) built directly by the caller. The
-  caller is responsible for pre-cleaning each phone number into valid international format
-  themselves (e.g. by running it through the SDK's existing number-validation helper) before
-  constructing each entry — this function does **not** validate or normalize numbers on the
-  caller's behalf, so an invalid number in the list will simply be rejected by the backend API
-  rather than being caught client-side.
-- A function that accepts a map/dictionary of phone number → message text. Here the SDK *does*
-  validate and normalize each key using its existing number-validation logic before building the
-  request. Any key that fails validation (doesn't match the accepted phone number shape) is
-  **silently discarded, along with its associated message** — it is the caller's responsibility
-  to supply numbers that will pass validation if they want them included. This mirrors the
-  existing validation shape used elsewhere in the SDK: an optional leading `+`, followed by
-  either a leading `0` or a 3-digit prefix, followed by exactly 9 more digits.
+call, via a function that accepts a list of `MessageModel` instances which the programmer explicitly builds within their own logic loop.
 
 **Per-language status:**
 
-- [ ] Java
-- [ ] Kotlin
+- [x] Java
+- [x] Kotlin
 - [ ] JavaScript/TypeScript
 - [ ] Python
 - [ ] Ruby

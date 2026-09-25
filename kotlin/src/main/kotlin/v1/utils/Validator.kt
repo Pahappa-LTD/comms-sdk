@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.postForEntity
 import v1.CommsSDK
-import v1.CommsSDK.Companion.API_URL
 import v1.CommsSDK.Companion.OBJECT_MAPPER
 import v1.models.ApiRequest
 import v1.models.ApiResponse
@@ -44,7 +43,7 @@ object Validator {
         apiRequest.userdata = UserData(sdk.userName, sdk.apiKey)
         apiRequest.walletType = WalletType.LOCAL
         try {
-            val res: ResponseEntity<String> = client.postForEntity(API_URL, apiRequest)
+            val res: ResponseEntity<String> = client.postForEntity(sdk.apiUrl, apiRequest)
             val apiResponse: ApiResponse = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)
 
             when(apiResponse.status) {

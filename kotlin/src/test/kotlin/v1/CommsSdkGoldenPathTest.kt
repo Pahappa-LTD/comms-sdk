@@ -1,3 +1,5 @@
+package v1
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.net.httpserver.HttpServer
 import v1.CommsSDK
@@ -44,7 +46,7 @@ class CommsSdkGoldenPathTest {
             exchange.responseBody.use { it.write(bytes) }
         }
         server.start()
-        CommsSDK.API_URL = "http://localhost:${server.address.port}/"
+        CommsSDK.instance.apiUrl = "http://localhost:${server.address.port}/"
     }
 
     @AfterTest

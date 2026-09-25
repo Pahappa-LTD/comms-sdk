@@ -34,12 +34,12 @@ public class LiveSandboxSmokeTest {
 
     @Before
     public void setUp() {
-        originalApiUrl = CommsSDK.API_URL;
+        originalApiUrl = CommsSDK.getInstance().getApiUrl();
     }
 
     @After
     public void tearDown() {
-        CommsSDK.API_URL = originalApiUrl;
+        CommsSDK.getInstance().setApiUrl(originalApiUrl);
     }
 
     private static void assumeSandboxCredentials() {

@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import static com.pahappa.systems.commssdk.v1.CommsSDK.API_URL;
 import static com.pahappa.systems.commssdk.v1.CommsSDK.OBJECT_MAPPER;
 import static com.pahappa.systems.commssdk.v1.utils.Log.println;
 
@@ -42,7 +41,7 @@ public final class Validator {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON); // force JSON because some edge cases had the media type being sent as XML
             HttpEntity<ApiRequest> entity = new HttpEntity<>(apiRequest, headers);
-            ResponseEntity<String> res = client.postForEntity(API_URL, entity, String.class);
+            ResponseEntity<String> res = client.postForEntity(sdk.getApiUrl(), entity, String.class);
             ApiResponse apiResponse = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
             switch (apiResponse.getStatus()) {
                 case OK:

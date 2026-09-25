@@ -32,15 +32,25 @@ public class CommsSDK {
      * Shared Jackson object mapper for JSON serialization.
      */
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final String LIVE_API_URL = "https://comms.egosms.co/api/v1/json";
+    private static final String SANDBOX_API_URL = "https://comms-test.pahappa.net/api/v1/json";
+    /**
+     * Temporary since we are shifting the SDK's API URL to be object-based and not a static field.
+     */
+    @Deprecated
+    private static CommsSDK instance = new CommsSDK();
     /**
      * The API endpoint URL. Defaults to the live server.
      */
-    public static String API_URL = "https://comms.egosms.co/api/v1/json/";
+    @Getter
+    private String apiUrl = LIVE_API_URL;
 
     @Getter
+    @Setter
     private String userName;
 
     @Getter
+    @Setter
     private String apiKey;
 
     @Getter
@@ -55,42 +65,89 @@ public class CommsSDK {
     /**
      * Private constructor. Use {@link #authenticate(String, String)} to create an instance.
      */
-    private CommsSDK() {
+    private CommsSDK() {}
+
+    public CommsSDK(String userName, String apiKey) {
+        this.userName = userName;
+        this.apiKey = apiKey;
+    }
+
+    public CommsSDK authenticate() {
+        apiUrl = LIVE_API_URL;
+        isAuthenticated = Validator.validateCredentials(this);
+        return this;
+    }
+
+    public CommsSDK authenticateSandbox() {
+        apiUrl = SANDBOX_API_URL;
+        isAuthenticated = Validator.validateCredentials(this);
+        return this;
     }
 
     /**
      * Authenticates and creates a new CommsSDK instance.
+     * <br/>
+     * Deprecated, use this instead:
+     * <pre>
+     *     {@code
+     *         CommsSDK sdk = new CommsSDK(user, pass);
+     *         sdk.authenticate();
+     *         // or if using the sandbox:
+     *         sdk.authenticateSandbox();
+     *      }
+     * </pre>
      *
      * @param userName Your account username.
      * @param apiKey   Your API key.
      * @return Authenticated CommsSDK instance.
      */
+    @Deprecated
     public static CommsSDK authenticate(String userName, String apiKey) {
-        CommsSDK sdk = new CommsSDK();
-        sdk.userName = userName;
-        sdk.apiKey = apiKey;
-        sdk.isAuthenticated = Validator.validateCredentials(sdk);
-        return sdk;
+        instance.userName = userName;
+        instance.apiKey = apiKey;
+        instance.isAuthenticated = Validator.validateCredentials(instance);
+        return instance;
     }
 
     /**
      * Switches the SDK to use the sandbox environment (for testing).
+     * <br/>
+     * Deprecated, use this instead:
+     * <pre>
+     *     {@code
+     *         CommsSDK sdk = new CommsSDK(user, pass);
+     *         sdk.authenticate();
+     *         // or if using the sandbox:
+     *         sdk.authenticateSandbox();
+     *      }
+     * </pre>
      * <br>
      * Make an account at <a href="http://comms-test.pahappa.net">comms-test.pahappa.net</a> to use the sandbox.
      * Use {@link CommsSDK#useLiveServer()} for the live server.
      */
+    @Deprecated
     public static void useSandBox() {
-        API_URL = "https://comms-test.pahappa.net/api/v1/json";
+        instance.apiUrl = SANDBOX_API_URL;
     }
 
     /**
      * Switches the SDK to use the live environment (for production).
      * <br>
+     * Deprecated, use this instead:
+     * <pre>
+     *     {@code
+     *         CommsSDK sdk = new CommsSDK(user, pass);
+     *         sdk.authenticate();
+     *         // or if using the sandbox:
+     *         sdk.authenticateSandbox();
+     *      }
+     * </pre>
      * Make an account at <a href="http://comms.egosms.co">comms.egosms.co</a> to use the live server.
      * Use {@link CommsSDK#useSandBox()} for the sandbox server.
      */
+    @Deprecated
     public static void useLiveServer() {
-        API_URL = "https://comms.egosms.co/api/v1/json";
+        instance.apiUrl = LIVE_API_URL;
     }
 
     /**
@@ -332,8 +389,6 @@ public class CommsSDK {
             println("No valid phone numbers provided. Please check inputs.");
             return null;
         }
-        ApiRequest apiRequest = new ApiRequest();
-        apiRequest.setMethod("SendSms");
         List<MessageModel> messageModels = new ArrayList<>();
         for (String num : numbers) {
             MessageModel messageModel = new MessageModel();
@@ -343,7 +398,19 @@ public class CommsSDK {
             messageModel.setPriority(priority);
             messageModels.add(messageModel);
         }
-        apiRequest.setMessageData(messageModels);
+        return sendCustomSMS(messageModels);
+    }
+
+    /**
+     * This method accepts a custom-built list of {@link MessageModel} objects, for maximum flexibility.
+     *
+     * @param messages Custom-built list of message objects to be sent to the API
+     * @return ApiResponse object with status and details, or null on error.
+     */
+    public ApiResponse sendCustomSMS(List<MessageModel> messages) {
+        ApiRequest apiRequest = new ApiRequest();
+        apiRequest.setMethod("SendSms");
+        apiRequest.setMessageData(messages);
         apiRequest.setUserdata(new UserData(userName, apiKey));
         apiRequest.setWalletType(WalletType.LOCAL);
         ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
@@ -363,7 +430,7 @@ public class CommsSDK {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<ApiRequest> entity = new HttpEntity<>(apiRequest, headers);
-        return client.postForEntity(API_URL, entity, String.class);
+        return client.postForEntity(apiUrl, entity, String.class);
     }
 
     /**
@@ -432,6 +499,17 @@ public class CommsSDK {
      */
     public double getBalance(WalletType walletType) {
         return queryBalance(walletType).getBalance();
+    }
+
+    /**
+     * For tests
+     */
+    void setApiUrl(String apiUrl) {
+        this.apiUrl = apiUrl;
+    }
+
+    static CommsSDK getInstance() {
+        return instance;
     }
 
     /**

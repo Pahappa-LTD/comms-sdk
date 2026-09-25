@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,15 +34,15 @@ public class CommsSDKTest {
 
     @Before
     public void setUp() throws Exception {
-        originalApiUrl = CommsSDK.API_URL;
+        originalApiUrl = CommsSDK.getInstance().getApiUrl();
         server = new MockCommsApiServer();
-        CommsSDK.API_URL = server.url();
+        CommsSDK.getInstance().setApiUrl(server.url());
     }
 
     @After
     public void tearDown() {
         server.close();
-        CommsSDK.API_URL = originalApiUrl;
+        CommsSDK.getInstance().setApiUrl(originalApiUrl);
     }
 
     @Test

@@ -2,10 +2,11 @@ package v1
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.postForEntity
 import v1.models.*
 import v1.utils.*
 
-final class CommsSDK {
+class CommsSDK {
     var userName: String = ""
         private set
     var apiKey: String = ""
@@ -14,18 +15,22 @@ final class CommsSDK {
         private set
     var senderId: String = "EgoSMS"
         private set
+    internal var apiUrl: String = LIVE_API_URL
 
     companion object {
-        var API_URL = "https://comms.egosms.co/api/v1/json/"
+        const val LIVE_API_URL = "https://comms.egosms.co/api/v1/json"
+        const val SANDBOX_API_URL = "https://comms-test.pahappa.net/api/v1/json"
+
         val OBJECT_MAPPER = ObjectMapper()
         val client = RestTemplate()
+        internal val instance: CommsSDK = CommsSDK()
 
+        @Deprecated(message = "This is discontinued. Use sdkObject.authenticate() instead.")
         fun authenticate(userName: String, apiKey: String): CommsSDK {
-            val commsSDK = CommsSDK()
-            commsSDK.userName = userName
-            commsSDK.apiKey = apiKey
-            commsSDK.isAuthenticated = Validator.validateCredentials(commsSDK)
-            return commsSDK
+            instance.userName = userName
+            instance.apiKey = apiKey
+            instance.isAuthenticated = Validator.validateCredentials(instance)
+            return instance
         }
 
         /**
@@ -34,8 +39,9 @@ final class CommsSDK {
          * Make an account at "[comms-test.pahappa.net](https://comms-test.pahappa.net)" to use the sandbox.
          * Use [useLiveServer] for the live server.
          */
+        @Deprecated(message = "This is discontinued. Use sdkObject.authenticate() instead.")
         fun useSandBox() {
-            API_URL = "https://comms-test.pahappa.net/api/v1/json"
+            instance.apiUrl = SANDBOX_API_URL
         }
 
         /**
@@ -44,10 +50,30 @@ final class CommsSDK {
          * Make an account at "[comms.egosms.co](https://comms.egosms.co)" to use the live server.
          * Use [useSandBox] for the sandbox server.
          */
+        @Deprecated(message = "This is discontinued. Use sdkObject.authenticateSandbox() instead.")
         fun useLiveServer() {
-            API_URL = "https://comms.egosms.co/api/v1/json"
+            instance.apiUrl = LIVE_API_URL
         }
 
+    }
+
+    private constructor()
+
+    constructor(userName: String, apiKey: String) {
+        this.userName = userName
+        this.apiKey = apiKey
+    }
+
+    fun authenticate(): CommsSDK {
+        apiUrl = LIVE_API_URL
+        isAuthenticated = Validator.validateCredentials(this)
+        return this
+    }
+
+    fun authenticateSandbox(): CommsSDK {
+        apiUrl = SANDBOX_API_URL
+        isAuthenticated = Validator.validateCredentials(this)
+        return this
     }
 
     fun withSenderId(senderId: String): CommsSDK {
@@ -86,6 +112,7 @@ final class CommsSDK {
                 println("Failed: ${apiResponse.message}")
                 return false
             }
+
             else -> throw RuntimeException("Unexpected response status: " + apiResponse.status)
         }
     }
@@ -124,8 +151,6 @@ final class CommsSDK {
             System.err.println("No valid phone numbers provided. Please check inputs.")
             return null
         }
-        val apiRequest = ApiRequest()
-        apiRequest.method = "SendSms"
         val messageModels: MutableList<MessageModel> = ArrayList()
         for (num in numbers) {
             val messageModel = MessageModel()
@@ -135,10 +160,16 @@ final class CommsSDK {
             messageModel.priority = priority
             messageModels.add(messageModel)
         }
-        apiRequest.messageData = messageModels
+        return sendCustomSMS(messageModels)
+    }
+
+    fun sendCustomSMS(messages: MutableList<MessageModel>): ApiResponse? {
+        val apiRequest = ApiRequest()
+        apiRequest.method = "SendSms"
+        apiRequest.messageData = messages
         apiRequest.userdata = UserData(userName, apiKey)
         apiRequest.walletType = WalletType.LOCAL
-        val res = client.postForEntity(API_URL, apiRequest, String::class.java)
+        val res = client.postForEntity<String>(apiUrl, apiRequest)
 
         try {
             return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)
@@ -172,7 +203,7 @@ final class CommsSDK {
         apiRequest.userdata = UserData(userName, apiKey)
         apiRequest.walletType = walletType
         try {
-            val res = client.postForEntity(API_URL, apiRequest, String::class.java)
+            val res = client.postForEntity(apiUrl, apiRequest, String::class.java)
             val response = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)
             return response
         } catch (e: Exception) {
