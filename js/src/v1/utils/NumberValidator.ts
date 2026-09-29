@@ -1,16 +1,19 @@
+import anylogger from "anylogger";
+const logger = anylogger('@pahappalimited/comms-sdk')
+
 export class NumberValidator {
     private static regex = /^\+?(0|\d{3})\d{9}$/;
 
     public static validateNumbers(numbers: string[]): string[] {
         if (!numbers || numbers.length === 0) {
-            console.log('Number list cannot be null or empty');
+            logger.warn('Number list cannot be null or empty');
             return [];
         }
 
         const cleansed: string[] = [];
         for (const number of numbers) {
             if (!number || number.trim().length === 0) {
-                console.log(`Number (${number}) cannot be null or empty!`);
+                logger.warn(`Number (${number}) cannot be null or empty!`);
                 continue;
             }
 
@@ -23,7 +26,7 @@ export class NumberValidator {
                 }
                 cleansed.push(cleanedNumber);
             } else {
-                console.log(`Number (${number}) is not valid!`);
+                logger.error(`Number (${number}) is not valid!`);
             }
         }
         return [...new Set(cleansed)];

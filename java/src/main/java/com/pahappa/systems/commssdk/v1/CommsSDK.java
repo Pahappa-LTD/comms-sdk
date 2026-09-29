@@ -2,23 +2,19 @@ package com.pahappa.systems.commssdk.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pahappa.systems.commssdk.v1.models.*;
+import com.pahappa.systems.commssdk.v1.utils.NetworkHelper;
 import com.pahappa.systems.commssdk.v1.utils.NumberValidator;
 import com.pahappa.systems.commssdk.v1.utils.Validator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-
-import static com.pahappa.systems.commssdk.v1.utils.Log.println;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main entry point for interacting with the CommsSDK.
@@ -34,11 +30,11 @@ public class CommsSDK {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String LIVE_API_URL = "https://comms.egosms.co/api/v1/json";
     private static final String SANDBOX_API_URL = "https://comms-test.pahappa.net/api/v1/json";
+    private static final Logger log = LoggerFactory.getLogger(CommsSDK.class);
     /**
      * Temporary since we are shifting the SDK's API URL to be object-based and not a static field.
      */
-    @Deprecated
-    private static CommsSDK instance = new CommsSDK();
+    static String defaultUrl = LIVE_API_URL;
     /**
      * The API endpoint URL. Defaults to the live server.
      */
@@ -46,26 +42,16 @@ public class CommsSDK {
     private String apiUrl = LIVE_API_URL;
 
     @Getter
-    @Setter
     private String userName;
 
     @Getter
-    @Setter
     private String apiKey;
 
     @Getter
-    @Setter
     private String senderId = "EgoSMS";
 
     @Getter
     private boolean isAuthenticated = false;
-
-    private final RestTemplate client = new RestTemplate();
-
-    /**
-     * Private constructor. Use {@link #authenticate(String, String)} to create an instance.
-     */
-    private CommsSDK() {}
 
     public CommsSDK(String userName, String apiKey) {
         this.userName = userName;
@@ -103,10 +89,10 @@ public class CommsSDK {
      */
     @Deprecated
     public static CommsSDK authenticate(String userName, String apiKey) {
-        instance.userName = userName;
-        instance.apiKey = apiKey;
-        instance.isAuthenticated = Validator.validateCredentials(instance);
-        return instance;
+        CommsSDK commsSDK = new CommsSDK(userName, apiKey);
+        commsSDK.apiUrl = defaultUrl;
+        commsSDK.isAuthenticated = Validator.validateCredentials(commsSDK);
+        return commsSDK;
     }
 
     /**
@@ -127,7 +113,7 @@ public class CommsSDK {
      */
     @Deprecated
     public static void useSandBox() {
-        instance.apiUrl = SANDBOX_API_URL;
+        defaultUrl = SANDBOX_API_URL;
     }
 
     /**
@@ -147,7 +133,7 @@ public class CommsSDK {
      */
     @Deprecated
     public static void useLiveServer() {
-        instance.apiUrl = LIVE_API_URL;
+        defaultUrl = LIVE_API_URL;
     }
 
     /**
@@ -256,16 +242,16 @@ public class CommsSDK {
     public boolean sendSMS(List<String> numbers, String message, String senderId, MessagePriority priority) {
         ApiResponse apiResponse = querySendSMS(numbers, message, senderId, priority);
         if (apiResponse == null) {
-            println("Failed to get a response from the server.");
+            log.error("Failed to get a response from the server.");
             return false;
         }
         switch (apiResponse.getStatus()) {
             case OK:
-                println("SMS sent successfully.");
-                println("MessageFollowUpUniqueCode: " + apiResponse.getMessageFollowUpCode());
+                log.info("SMS sent successfully.");
+                log.info("MessageFollowUpUniqueCode: {}", apiResponse.getMessageFollowUpCode());
                 return true;
             case Failed:
-                println("Failed: " + apiResponse.getMessage());
+                log.error("Failed: {}", apiResponse.getMessage());
                 return false;
             default:
                 throw new RuntimeException("Unexpected response status: " + apiResponse.getStatus());
@@ -379,14 +365,14 @@ public class CommsSDK {
             senderId = this.senderId;
         }
         if (senderId != null && senderId.length() > 11) {
-            println("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.");
+            log.warn("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.");
         }
         if (priority == null) {
             priority = MessagePriority.HIGH;
         }
         numbers = NumberValidator.validateNumbers(numbers);
         if (numbers.isEmpty()) {
-            println("No valid phone numbers provided. Please check inputs.");
+            log.error("No valid phone numbers provided. Please check inputs.");
             return null;
         }
         List<MessageModel> messageModels = new ArrayList<>();
@@ -408,29 +394,27 @@ public class CommsSDK {
      * @return ApiResponse object with status and details, or null on error.
      */
     public ApiResponse sendCustomSMS(List<MessageModel> messages) {
+        if (sdkNotAuthenticated()) return null;
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setMethod("SendSms");
         apiRequest.setMessageData(messages);
         apiRequest.setUserdata(new UserData(userName, apiKey));
         apiRequest.setWalletType(WalletType.LOCAL);
-        ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
         try {
-            return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
+            String res = sendRequest(apiRequest);
+            return OBJECT_MAPPER.readValue(res, ApiResponse.class);
         } catch (Exception e) {
-            println("Failed to send SMS: " + e.getMessage());
+            log.error("Failed to send SMS: ", e);
             try {
-                println("Request: " + OBJECT_MAPPER.writeValueAsString(apiRequest));
+                log.debug("Request: {}", OBJECT_MAPPER.writeValueAsString(apiRequest));
             } catch (Exception ignored) {
             }
             return null;
         }
     }
 
-    private @NonNull ResponseEntity<String> sendAsContentTypeJson(ApiRequest apiRequest) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<ApiRequest> entity = new HttpEntity<>(apiRequest, headers);
-        return client.postForEntity(apiUrl, entity, String.class);
+    private @NonNull String sendRequest(ApiRequest apiRequest) throws IOException {
+        return NetworkHelper.post(apiRequest, apiUrl);
     }
 
     /**
@@ -440,8 +424,8 @@ public class CommsSDK {
      */
     private boolean sdkNotAuthenticated() {
         if (!isAuthenticated) {
-            println("SDK is not authenticated. Please authenticate before performing actions.");
-            println("Attempting to re-authenticate with provided credentials...");
+            log.warn("SDK is not authenticated. Please authenticate before performing actions.");
+            log.warn("Attempting to re-authenticate with provided credentials...");
             isAuthenticated = Validator.validateCredentials(this);
             return !isAuthenticated;
         }
@@ -475,8 +459,8 @@ public class CommsSDK {
         apiRequest.setUserdata(new UserData(userName, apiKey));
         apiRequest.setWalletType(walletType);
         try {
-            ResponseEntity<String> res = sendAsContentTypeJson(apiRequest);
-            return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
+            String res = sendRequest(apiRequest);
+            return OBJECT_MAPPER.readValue(res, ApiResponse.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get balance: " + e.getMessage(), e);
         }
@@ -502,23 +486,12 @@ public class CommsSDK {
     }
 
     /**
-     * For tests
-     */
-    void setApiUrl(String apiUrl) {
-        this.apiUrl = apiUrl;
-    }
-
-    static CommsSDK getInstance() {
-        return instance;
-    }
-
-    /**
      * Returns a string representation of the SDK instance.
      *
      * @return String representation.
      */
     @Override
     public String toString() {
-        return "SDK(" + userName + " => " + apiKey + ")";
+        return String.format("SDK(%s, %s, %s)", userName, senderId, apiUrl);
     }
 }

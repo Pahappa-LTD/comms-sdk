@@ -5,16 +5,14 @@ import com.pahappa.systems.commssdk.v1.models.ApiRequest;
 import com.pahappa.systems.commssdk.v1.models.ApiResponse;
 import com.pahappa.systems.commssdk.v1.models.UserData;
 import com.pahappa.systems.commssdk.v1.models.WalletType;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.pahappa.systems.commssdk.v1.CommsSDK.OBJECT_MAPPER;
-import static com.pahappa.systems.commssdk.v1.utils.Log.println;
 
 public final class Validator {
+    private static final Logger log = LoggerFactory.getLogger(Validator.class);
+
     public static boolean validateCredentials(CommsSDK sdk) {
         if (sdk == null) {
             throw new IllegalArgumentException("CommsSDK instance cannot be null");
@@ -23,29 +21,24 @@ public final class Validator {
             throw new IllegalArgumentException("Either API Key or Username and Password must be provided");
         }
         if (!isValidCredential(sdk)) {
-            println("Authentication failed");
+            log.error("Authentication failed");
             return false;
         }
-        println("Validated using an api key");
+        log.info("Validated using an api key");
         return true;
     }
 
-
     private static boolean isValidCredential(CommsSDK sdk) {
-        RestTemplate client = new RestTemplate();
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setMethod("Balance");
         apiRequest.setUserdata(new UserData(sdk.getUserName(), sdk.getApiKey()));
         apiRequest.setWalletType(WalletType.LOCAL);
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON); // force JSON because some edge cases had the media type being sent as XML
-            HttpEntity<ApiRequest> entity = new HttpEntity<>(apiRequest, headers);
-            ResponseEntity<String> res = client.postForEntity(sdk.getApiUrl(), entity, String.class);
-            ApiResponse apiResponse = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse.class);
+            String res = NetworkHelper.post(apiRequest, sdk.getApiUrl());
+            ApiResponse apiResponse = OBJECT_MAPPER.readValue(res, ApiResponse.class);
             switch (apiResponse.getStatus()) {
                 case OK:
-                    println("Credentials validated successfully.");
+                    log.info("Credentials validated successfully.");
                     return true;
                 case Failed:
                     throw new Exception(apiResponse.getMessage());
@@ -53,9 +46,8 @@ public final class Validator {
                     return false;
             }
         } catch (Exception e) {
-            println("Error validating credentials: " + e.getMessage());
+            log.error("Error validating credentials: ", e);
             return false;
         }
     }
-
 }

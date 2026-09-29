@@ -1,8 +1,10 @@
+import anylogger from "anylogger";
 import { CommsSDK } from "../CommsSDK";
 import { ApiRequest } from "../models/ApiRequest";
 import { UserData } from "../models/UserData";
 import { WalletType } from "../models/WalletType";
 import axios from 'axios';
+const logger = anylogger('@pahappalimited/comms-sdk')
 
 export class Validator {
     public static async validateCredentials(sdk: CommsSDK): Promise<boolean> {
@@ -15,16 +17,11 @@ export class Validator {
         }
 
         if (!(await Validator.isValidCredential(sdk))) {
-            console.log("                                                      _                    ");
-            console.log("  /\     _|_ |_   _  ._ _|_ o  _  _. _|_ o  _  ._    |_ _. o |  _   _| | | ");
-            console.log(" /--\ |_| |_ | | (/_ | | |_ | (_ (_|  |_ | (_) | |   | (_| | | (/_ (_| o o ");
-            console.log("                                                                           ");
-            console.log("\n");
+          logger.error('Authentication Failed')
             return false;
         }
 
-        console.log("Validated using an api key");
-        console.log("\n");
+        logger.info("Validated using an api key");
         sdk.setAuthenticated();
         return true;
     }
@@ -36,19 +33,19 @@ export class Validator {
         apiRequest.setWalletType(WalletType.LOCAL);
 
         try {
-            console.log(`API_URL: ${CommsSDK.API_URL}`);
-            const response = await axios.post(CommsSDK.API_URL, apiRequest.toArray());
+            logger.debug(`API_URL: ${sdk.apiUrl}`);
+            const response = await axios.post(sdk.apiUrl, apiRequest.toArray());
             const apiResponse = response.data;
 
             if (apiResponse.Status === 'OK') {
-                console.log("Credentials validated successfully.\n");
+                logger.info("Credentials validated successfully.\n");
                 return true;
             } else {
                 throw new Error(apiResponse.Message);
             }
         } catch (e) {
             // @ts-ignore
-            console.log(`Error validating credentials: ${e.message}\n`);
+            logger.error(`Error validating credentials: ${e.message}\n`);
             return false;
         }
     }

@@ -34,15 +34,15 @@ public class CommsSDKTest {
 
     @Before
     public void setUp() throws Exception {
-        originalApiUrl = CommsSDK.getInstance().getApiUrl();
+        originalApiUrl = CommsSDK.defaultUrl;
         server = new MockCommsApiServer();
-        CommsSDK.getInstance().setApiUrl(server.url());
+        CommsSDK.defaultUrl = server.url();
     }
 
     @After
     public void tearDown() {
         server.close();
-        CommsSDK.getInstance().setApiUrl(originalApiUrl);
+        CommsSDK.defaultUrl = originalApiUrl;
     }
 
     @Test

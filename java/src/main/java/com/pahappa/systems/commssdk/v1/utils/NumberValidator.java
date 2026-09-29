@@ -1,15 +1,16 @@
 package com.pahappa.systems.commssdk.v1.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.pahappa.systems.commssdk.v1.utils.Log.printf;
-import static com.pahappa.systems.commssdk.v1.utils.Log.println;
-
 public final class NumberValidator {
     private static final String regex = "^\\+?(0|\\d{3})\\d{9}$";
+    private static final Logger log = LoggerFactory.getLogger(NumberValidator.class);
 
     /**
      * Validates a list of phone numbers.
@@ -22,14 +23,14 @@ public final class NumberValidator {
      */
     public static List<String> validateNumbers(List<String> numbers) {
         if (numbers == null || numbers.isEmpty()) {
-            println("Number list cannot be null or empty");
+            log.warn("Number list cannot be null or empty");
             return new ArrayList<>();
         }
 
         Set<String> _cleansed = new HashSet<>();
         for (String number : numbers) {
             if (number == null || number.trim().isEmpty()) {
-                printf("Number (%s) cannot be null or empty!\n", number);
+                log.warn("Number ({}) cannot be null or empty!", number);
                 continue;
             }
             number = number.trim().replaceAll("-|\\s", "");
@@ -41,7 +42,7 @@ public final class NumberValidator {
                 }
                 _cleansed.add(number);
             } else {
-                printf("Number (%s) is not valid!\n", number);
+                log.error("Number ({}) is not valid!", number);
             }
         }
         return new ArrayList<>(_cleansed);

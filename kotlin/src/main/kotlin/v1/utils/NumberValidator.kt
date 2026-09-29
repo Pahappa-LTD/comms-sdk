@@ -1,7 +1,11 @@
 package v1.utils
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 object NumberValidator {
-    private const val regex = "^\\+?(0|\\d{3})\\d{9}$"
+    private const val REGEX = "^\\+?(0|\\d{3})\\d{9}$"
+    val log: Logger = LoggerFactory.getLogger(NumberValidator::class.java)
 
     /**
      * Validates a list of phone numbers.
@@ -15,7 +19,7 @@ object NumberValidator {
      */
     fun validateNumbers(numbers: List<String>): List<String> {
         if (numbers.isEmpty()) {
-            println("Number list cannot be empty")
+            log.warn("Number list cannot be empty")
             return ArrayList()
         }
 
@@ -23,11 +27,11 @@ object NumberValidator {
         for (number in numbers) {
             var number = number
             if (number.trim { it <= ' ' }.isEmpty()) {
-                printf("Number (%s) cannot be empty!\n", number)
+                log.warn("Number ({}) cannot be empty!", number)
                 continue
             }
             number = number.trim { it <= ' ' }.replace("-|\\s".toRegex(), "")
-            if (number.matches(regex.toRegex())) {
+            if (number.matches(REGEX.toRegex())) {
                 if (number.startsWith("0")) {
                     number = "256" + number.substring(1)
                 } else if (number.startsWith("+")) {
@@ -35,7 +39,7 @@ object NumberValidator {
                 }
                 cleansed.add(number)
             } else {
-                printf("Number (%s) is not valid!\n", number)
+                log.error("Number ({}) is not valid!", number)
             }
         }
         return ArrayList(cleansed)

@@ -195,9 +195,9 @@ Today the active endpoint (live vs. sandbox) is process-global configuration sha
 client instance (see `TESTS.md` §1, `ENV-*`). This will change so that each client instance
 carries its own endpoint, fixed at creation time:
 
-- Add `authenticate(username, apiKey)` — authenticates against the **live** endpoint
+- Add `authenticate()` — authenticates against the **live** endpoint
   (`https://comms.egosms.co/api/v1/json/`) and returns a client instance bound to it.
-- Add `authenticateSandbox(username, apiKey)` — authenticates against the **sandbox** endpoint
+- Add `authenticateSandbox()` — authenticates against the **sandbox** endpoint
   (`https://comms-test.pahappa.net/api/v1/json/`) and returns a client instance bound to it.
 - Deprecate the static/global endpoint switches (e.g. `useSandBox()` / `useLiveServer()`, or each
   language's equivalent) in favor of the two constructors above. Existing global switches should
@@ -210,7 +210,7 @@ carries its own endpoint, fixed at creation time:
 
 - [x] Java
 - [x] Kotlin
-- [ ] JavaScript/TypeScript
+- [x] JavaScript/TypeScript
 - [ ] Python
 - [ ] Ruby
 - [ ] PHP
@@ -229,7 +229,7 @@ call, via a function that accepts a list of `MessageModel` instances which the p
 
 - [x] Java
 - [x] Kotlin
-- [ ] JavaScript/TypeScript
+- [x] JavaScript/TypeScript
 - [ ] Python
 - [ ] Ruby
 - [ ] PHP

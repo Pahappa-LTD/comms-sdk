@@ -1,10 +1,14 @@
 package v1
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.postForEntity
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import v1.CommsSDK.Companion.useLiveServer
+import v1.CommsSDK.Companion.useSandBox
 import v1.models.*
-import v1.utils.*
+import v1.utils.NetworkHelper
+import v1.utils.NumberValidator
+import v1.utils.Validator
 
 class CommsSDK {
     var userName: String = ""
@@ -20,17 +24,20 @@ class CommsSDK {
     companion object {
         const val LIVE_API_URL = "https://comms.egosms.co/api/v1/json"
         const val SANDBOX_API_URL = "https://comms-test.pahappa.net/api/v1/json"
+        val log: Logger = LoggerFactory.getLogger(CommsSDK::class.java)
 
         val OBJECT_MAPPER = ObjectMapper()
-        val client = RestTemplate()
-        internal val instance: CommsSDK = CommsSDK()
+        internal var defaultUrl: String = LIVE_API_URL
 
-        @Deprecated(message = "This is discontinued. Use sdkObject.authenticate() instead.")
+        @Deprecated(
+            message = "This is discontinued. Use sdkObject.authenticate() instead.",
+            replaceWith = ReplaceWith("CommsSDK(userName, apiKey).authenticate()")
+        )
         fun authenticate(userName: String, apiKey: String): CommsSDK {
-            instance.userName = userName
-            instance.apiKey = apiKey
-            instance.isAuthenticated = Validator.validateCredentials(instance)
-            return instance
+            val commsSDK = CommsSDK(userName, apiKey)
+            commsSDK.apiUrl = defaultUrl
+            commsSDK.isAuthenticated = Validator.validateCredentials(commsSDK)
+            return commsSDK
         }
 
         /**
@@ -39,9 +46,9 @@ class CommsSDK {
          * Make an account at "[comms-test.pahappa.net](https://comms-test.pahappa.net)" to use the sandbox.
          * Use [useLiveServer] for the live server.
          */
-        @Deprecated(message = "This is discontinued. Use sdkObject.authenticate() instead.")
+        @Deprecated(message = "This is discontinued. Use sdkObject.authenticateSandbox() instead.")
         fun useSandBox() {
-            instance.apiUrl = SANDBOX_API_URL
+            defaultUrl = SANDBOX_API_URL
         }
 
         /**
@@ -50,14 +57,12 @@ class CommsSDK {
          * Make an account at "[comms.egosms.co](https://comms.egosms.co)" to use the live server.
          * Use [useSandBox] for the sandbox server.
          */
-        @Deprecated(message = "This is discontinued. Use sdkObject.authenticateSandbox() instead.")
+        @Deprecated(message = "This is discontinued. Use sdkObject.authenticate() instead.")
         fun useLiveServer() {
-            instance.apiUrl = LIVE_API_URL
+            defaultUrl = LIVE_API_URL
         }
 
     }
-
-    private constructor()
 
     constructor(userName: String, apiKey: String) {
         this.userName = userName
@@ -98,18 +103,18 @@ class CommsSDK {
     ): Boolean {
         val apiResponse = querySendSMS(numbers, message, senderId, priority)
         if (apiResponse == null) {
-            println("Failed to get a response from the server.")
+            log.error("Failed to get a response from the server.")
             return false
         }
         when (apiResponse.status) {
             ApiResponseCode.OK -> {
-                println("SMS sent successfully.")
-                println("MessageFollowUpUniqueCode: " + apiResponse.messageFollowUpCode)
+                log.info("SMS sent successfully.")
+                log.info("MessageFollowUpUniqueCode: " + apiResponse.messageFollowUpCode)
                 return true
             }
 
             ApiResponseCode.Failed -> {
-                println("Failed: ${apiResponse.message}")
+                log.error("Failed: {}", apiResponse.message)
                 return false
             }
 
@@ -144,11 +149,11 @@ class CommsSDK {
             senderId = this.senderId
         }
         if (senderId.length > 11) {
-            println("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.")
+            log.warn("Warning: Sender ID length exceeds 11 characters. Some networks may truncate or reject messages.")
         }
         numbers = NumberValidator.validateNumbers(numbers)
         if (numbers.isEmpty()) {
-            System.err.println("No valid phone numbers provided. Please check inputs.")
+            log.error("No valid phone numbers provided. Please check inputs.")
             return null
         }
         val messageModels: MutableList<MessageModel> = ArrayList()
@@ -164,19 +169,20 @@ class CommsSDK {
     }
 
     fun sendCustomSMS(messages: MutableList<MessageModel>): ApiResponse? {
+        if (sdkNotAuthenticated()) return null
         val apiRequest = ApiRequest()
         apiRequest.method = "SendSms"
         apiRequest.messageData = messages
         apiRequest.userdata = UserData(userName, apiKey)
         apiRequest.walletType = WalletType.LOCAL
-        val res = client.postForEntity<String>(apiUrl, apiRequest)
 
         try {
-            return OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)
+            val res = sendRequest(apiRequest)
+            return OBJECT_MAPPER.readValue(res, ApiResponse::class.java)
         } catch (e: Exception) {
-            System.err.println("Failed to send SMS: " + e.message)
+            log.error("Failed to send SMS: ", e)
             try {
-                System.err.println("Request: " + OBJECT_MAPPER.writeValueAsString(apiRequest))
+                log.debug("Request: {}", OBJECT_MAPPER.writeValueAsString(apiRequest))
             } catch (_: Exception) {
             }
             return null
@@ -185,8 +191,8 @@ class CommsSDK {
 
     private fun sdkNotAuthenticated(): Boolean {
         if (!isAuthenticated) {
-            System.err.println("SDK is not authenticated. Please authenticate before performing actions.")
-            System.err.println("Attempting to re-authenticate with provided credentials...")
+            log.warn("SDK is not authenticated. Please authenticate before performing actions.")
+            log.warn("Attempting to re-authenticate with provided credentials...")
             isAuthenticated = Validator.validateCredentials(this);
             return !isAuthenticated;
         }
@@ -203,12 +209,15 @@ class CommsSDK {
         apiRequest.userdata = UserData(userName, apiKey)
         apiRequest.walletType = walletType
         try {
-            val res = client.postForEntity(apiUrl, apiRequest, String::class.java)
-            val response = OBJECT_MAPPER.readValue(res.getBody(), ApiResponse::class.java)
-            return response
+            val res = sendRequest(apiRequest)
+            return OBJECT_MAPPER.readValue(res, ApiResponse::class.java)
         } catch (e: Exception) {
             throw RuntimeException("Failed to get balance: " + e.message, e)
         }
+    }
+
+    private fun sendRequest(apiRequest: ApiRequest): String {
+        return NetworkHelper.post(apiRequest, apiUrl)
     }
 
     fun getBalance(walletType: WalletType = WalletType.LOCAL): Double? {
@@ -217,6 +226,6 @@ class CommsSDK {
     }
 
     override fun toString(): String {
-        return "SDK(${this.userName} => ${this.apiKey})"
+        return "SDK(${userName}, ${senderId}, ${apiUrl})"
     }
 }
